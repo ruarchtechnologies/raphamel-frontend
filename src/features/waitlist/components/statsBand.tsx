@@ -11,7 +11,7 @@ export function StatsBand() {
     return (
         <section ref={statsRef.ref} className="py-16" style={{ background: '#060E1C' }}>
             <div className="max-w-7xl mx-auto px-6">
-                <div className="flex flex-row justify-center gap-16 md:gap-32">
+                <div className="flex flex-row justify-center gap-12 md:gap-20">
                     {STATS.map((stat, i) => (
                         <motion.div
                             key={i}
@@ -21,13 +21,13 @@ export function StatsBand() {
                             className="text-center"
                         >
                             <div
-                                className="text-6xl md:text-7xl font-bold mb-3"
+                                className="text-5xl md:text-6xl font-bold mb-2"
                                 style={{ fontFamily: SANS, color: stat.yellow ? '#FACC15' : '#fff' }}
                             >
                                 {stat.value}
                             </div>
                             <div
-                                className="uppercase tracking-widest text-base"
+                                className="uppercase tracking-wide text-base"
                                 style={{ fontFamily: SANS, color: '#94A3B8' }}
                             >
                                 {stat.label}
