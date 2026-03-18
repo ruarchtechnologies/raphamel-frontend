@@ -24,7 +24,7 @@ export function ValuePropsSection() {
             Why Healthcare Providers Choose Raphamel
           </h2>
           <p
-            className="text-lg max-w-2xl mx-auto"
+            className="text-lg max-w-2xl mx-auto mb-6"
             style={{ fontFamily: SANS, color: '#475569' }}
           >
             Built for the unique needs of Nigerian healthcare procurement

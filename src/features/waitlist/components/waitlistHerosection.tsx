@@ -1,142 +1,154 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { HeroEmailInput } from './ui/WaitlistEmailInput';
-import { SuccessState } from './ui/SuccessState';
-import { DashboardCard } from './ui/DashboardCard';
-import { AVATARS } from '../constants';
-import { SANS, SERIF } from '../fonts';
+import './waitlistHero.css';
+
+const avatars = [
+  'https://images.unsplash.com/photo-1605369473971-c5e417ac3220?w=80&h=80&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1655720357761-f18ea9e5e7e6?w=80&h=80&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1762237798212-bcc000c00891?w=80&h=80&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1694787590597-ba49c7cdc2cc?w=80&h=80&fit=crop&crop=face',
+];
+
+const barHeights = [40, 65, 55, 80, 70, 90, 75];
 
 export function WaitlistHeroSection() {
-  const [activeHeroTab, setActiveHeroTab] = useState<'buyer' | 'supplier'>('buyer');
-  const [heroSubmitted, setHeroSubmitted] = useState(false);
+  const [activeTab, setActiveTab] = useState('buyer');
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   return (
-    <section className="relative min-h-screen pt-24 pb-16 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom right, #060E1C, #0A1628, #0E2444)' }} />
+    <section className="hero-root">
+      <div className="grid-overlay" />
+      <div className="glow-blue" />
+      <div className="glow-yellow" />
 
-      {/* Grid overlay */}
-      <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: 'linear-gradient(to right, #0071DC 1px, transparent 1px), linear-gradient(to bottom, #0071DC 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
+      <div className="hero-container">
+        {/* LEFT */}
+        <div className="left-col">
+          {/* <span className="badge">Early Access Opening Soon</span> */}
 
-      {/* Radial glows */}
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full pointer-events-none" style={{ background: 'rgba(0,113,220,0.2)', filter: 'blur(150px)' }} />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none" style={{ background: 'rgba(250,204,21,0.15)', filter: 'blur(150px)' }} />
+          <h1 className="headline">
+            Nigeria&apos;s{' '}
+            <span className="blue">B2B Medical</span>{' '}
+            Marketplace is Launching Soon
+          </h1>
 
-      <div className="relative max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <p className="subheadline">
+            Connect verified suppliers with healthcare facilities. Transparent pricing, reliable delivery, NAFDAC compliance built-in.
+          </p>
 
-          {/* Left column */}
-          <div className="space-y-8">
-
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1]"
-              style={{ fontFamily: SERIF }}
-            >
-              Nigeria&apos;s{' '}
-              <span style={{ color: '#0071DC' }}>B2B Medical</span>{' '}
-              Marketplace is Launching Soon
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg max-w-xl"
-              style={{ fontFamily: SANS, color: '#94A3B8' }}
-            >
-              Connect verified suppliers with healthcare facilities. Transparent pricing, reliable delivery, NAFDAC compliance built-in.
-            </motion.p>
-
-            {/* Buyer / Supplier toggle */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex gap-3"
-            >
-              {(['buyer', 'supplier'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveHeroTab(tab)}
-                  style={{
-                    fontFamily: SANS,
-                    background: activeHeroTab === tab ? '#0071DC' : 'rgba(255,255,255,0.06)',
-                    color: activeHeroTab === tab ? '#fff' : '#94A3B8',
-                  }}
-                  className="px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
-                >
-                  {tab === 'buyer' ? "I'm a Buyer" : "I'm a Supplier"}
-                </button>
-              ))}
-            </motion.div>
-
-            {/* Email form */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <AnimatePresence mode="wait">
-                {heroSubmitted ? (
-                  <motion.div key="success" exit={{ opacity: 0 }}>
-                    <SuccessState />
-                  </motion.div>
-                ) : (
-                  <motion.div key="form" exit={{ opacity: 0 }}>
-                    <HeroEmailInput onSuccess={() => setHeroSubmitted(true)} activeTab={activeHeroTab} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-
-            {/* Avatar stack */}
-            {!heroSubmitted && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="flex items-center gap-4"
+          <div className="toggle-wrap">
+            {(['buyer', 'supplier'] as const).map((tab) => (
+              <button
+                key={tab}
+                className={`toggle-btn${activeTab === tab ? ' active' : ''}`}
+                onClick={() => setActiveTab(tab)}
               >
-                <div className="flex -space-x-2">
-                  {AVATARS.map((avatar, i) => (
-                    <img
+                {tab === 'buyer' ? "I'm a Buyer" : "I'm a Supplier"}
+              </button>
+            ))}
+          </div>
+
+          {submitted ? (
+            <div className="success-state">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="9" stroke="#22C55E" strokeWidth="1.5" />
+                <path d="M6 10l3 3 5-5" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              You&apos;re on the list! We&apos;ll be in touch soon.
+            </div>
+          ) : (
+            <div className="form-row">
+              <input
+                type="email"
+                className="email-input"
+                placeholder="Enter your work email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button
+                className="cta-btn"
+                onClick={() => email && setSubmitted(true)}
+              >
+                Join Waitlist
+              </button>
+            </div>
+          )}
+
+          {!submitted && (
+            <div className="avatar-row">
+              <div className="avatar-stack">
+                {avatars.map((src, i) => (
+                  <img key={i} src={src} alt="" />
+                ))}
+              </div>
+              <p className="avatar-text">
+                <strong>1,200+</strong> already waiting
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT — Dashboard Card */}
+        <div className="dashboard-col">
+          <div className="card-float">
+            <div className="dashboard-card">
+              <div className="card-header">
+                <span className="card-title">Recent Orders</span>
+                <div className="nafdac-badge">
+                  <div className="nafdac-dot" />
+                  <span className="nafdac-text">NAFDAC Verified</span>
+                </div>
+              </div>
+
+              <div className="product-row">
+                <img
+                  className="product-img"
+                  src="/images/iv_fluid_test.jpg"
+                  alt="IV Fluid"
+                />
+                <div className="product-info">
+                  <div className="product-name">IV Fluid Set – 1000ml</div>
+                  <div className="supplier-row">
+                    <svg className="check-icon" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6l3 3 5-5" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    MedSupply Nigeria
+                  </div>
+                  <div className="price-row">
+                    <span className="price">&#8358;45,000</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="chart-section">
+                <span className="chart-label">Order Volume (Last 7 Days)</span>
+                <div className="bars">
+                  {barHeights.map((h, i) => (
+                    <div
                       key={i}
-                      src={avatar}
-                      alt=""
-                      className="w-10 h-10 rounded-full object-cover"
-                      style={{ border: '2px solid #060E1C' }}
+                      className="bar"
+                      style={{ height: `${h}%`, animationDelay: `${0.6 + i * 0.08}s` }}
                     />
                   ))}
                 </div>
-                <p className="text-sm" style={{ fontFamily: SANS, color: '#94A3B8' }}>
-                  <span className="text-white font-semibold">1,200+</span> already waiting
-                </p>
-              </motion.div>
-            )}
-          </div>
+              </div>
 
-          {/* Right column — dashboard card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="hidden lg:block"
-          >
-            <DashboardCard />
-          </motion.div>
+              <div className="stats-grid">
+                {[
+                  { label: 'Pending', value: '12' },
+                  { label: 'In Transit', value: '8' },
+                  { label: 'Delivered', value: '34' },
+                ].map((s, i) => (
+                  <div key={i} className="stat-cell">
+                    <span className="stat-value">{s.value}</span>
+                    <span className="stat-label">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

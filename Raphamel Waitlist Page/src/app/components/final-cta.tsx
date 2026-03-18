@@ -26,7 +26,7 @@ export function FinalCTA() {
           >
             Reserve Your Early Access
           </h2>
-          
+
           <p
             style={{ fontFamily: "'DM Sans', sans-serif" }}
             className="text-lg text-[#94A3B8] mb-8 max-w-2xl mx-auto"
@@ -47,7 +47,7 @@ export function FinalCTA() {
             <button
               type="submit"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
-              className="h-12 px-8 bg-[#FACC15] text-[#0F172A] font-semibold rounded-md hover:bg-[#EAB308] hover:scale-[1.03] transition-all duration-150"
+              className="h-12 px-12 bg-[#FACC15] text-[#0F172A] font-semibold rounded-full hover:bg-[#EAB308] hover:scale-[1.03] transition-all duration-150"
             >
               Get Early Access
             </button>

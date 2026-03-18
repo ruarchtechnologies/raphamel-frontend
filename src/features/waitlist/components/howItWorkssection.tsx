@@ -34,18 +34,24 @@ export function HowItWorksSection() {
                     </p>
 
                     {/* Tabs */}
-                    <div className="flex justify-center gap-4">
+                    <div
+                        className="inline-flex gap-1 p-1.5 rounded-full"
+                        style={{
+                            background: '#F1F5F9',
+                            border: '1px solid #E2E8F0',
+                        }}
+                    >
                         {(['buyers', 'suppliers'] as const).map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveHowTab(tab)}
                                 style={{
                                     fontFamily: SANS,
-                                    background: activeHowTab === tab ? '#0071DC' : '#F8FAFC',
+                                    background: activeHowTab === tab ? '#0071DC' : 'transparent',
                                     color: activeHowTab === tab ? '#fff' : '#475569',
-                                    border: activeHowTab === tab ? 'none' : '1px solid #E2E8F0',
+                                    boxShadow: activeHowTab === tab ? '0 4px 14px rgba(0,113,220,0.3)' : 'none',
                                 }}
-                                className="px-8 py-3 rounded-xl font-semibold transition-all duration-200"
+                                className="px-8 py-2.5 rounded-full font-semibold transition-all duration-300 text-sm"
                             >
                                 {tab === 'buyers' ? 'For Buyers' : 'For Suppliers'}
                             </button>
@@ -53,7 +59,7 @@ export function HowItWorksSection() {
                     </div>
                 </motion.div>
 
-                <div className="overflow-x-auto mt-16">
+                <div className="overflow-x-auto mt-10">
                     <div className="flex flex-row-5 gap-6 min-w-[640px]">
                         {howSteps.map((step, i) => (
                             <div className="flex-1 text-center">

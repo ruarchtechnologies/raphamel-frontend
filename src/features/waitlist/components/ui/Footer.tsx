@@ -9,13 +9,8 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: '#0071DC' }}
-            >
-              <span className="font-bold text-white text-sm" style={{ fontFamily: SANS }}>R</span>
-            </div>
+          <div className="flex items-center gap-0.5">
+            <img src="/images/logo.png" alt="Raphamel" className="h-14 w-auto" />
             <span className="font-bold text-white" style={{ fontFamily: SANS }}>
               Raphamel
             </span>
@@ -25,7 +20,7 @@ export function Footer() {
             className="text-sm"
             style={{ fontFamily: SANS, color: '#64748B' }}
           >
-            &copy; {new Date().getFullYear()} Raphamel. Healthcare Commerce, Connected.
+            &copy; {new Date().getFullYear()} Raphamel.
           </p>
 
           <div className="flex gap-6">
