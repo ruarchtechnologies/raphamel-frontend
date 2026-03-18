@@ -59,12 +59,11 @@ export function HowItWorksSection() {
                     </div>
                 </motion.div>
 
-                <div className="overflow-x-auto mt-10">
-                    <div className="flex flex-row-5 gap-6 min-w-[640px]">
+                <div className="mt-10">
+                    <div className="flex flex-col md:flex-row gap-8 md:gap-6">
                         {howSteps.map((step, i) => (
-                            <div className="flex-1 text-center">
+                            <div key={`${activeHowTab}-${i}`} className="flex-1 text-center">
                                 <motion.div
-                                    key={`${activeHowTab}-${i}`}
                                     initial={{ opacity: 0, y: 32 }}
                                     animate={howRef.isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}
                                     transition={{ duration: 0.6, delay: i * 0.1 }}
