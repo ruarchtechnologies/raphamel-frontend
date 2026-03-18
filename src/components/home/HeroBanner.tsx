@@ -68,7 +68,7 @@ const SLIDES = [
     bg: 'from-[#0f1f0a] to-[#1a3810]',
     accent: '#22c55e',
     image:
-      'https://images.unsplash.com/photo-1551601651-2a8f10b8a0f8?w=700&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=700&h=500&fit=crop',
     imageAlt: 'Surgical instruments on sterile drape',
     stats: [
       { label: 'Instrument SKUs', value: '5K+' },

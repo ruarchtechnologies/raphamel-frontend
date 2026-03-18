@@ -39,7 +39,7 @@ const MOCK_VENDORS = [
     slug: 'surgitech-africa',
     // IMAGE NEEDED: vendor-logo-surgitech-africa.png | Size: 100x100
     // Content: Scalpel/surgical icon, professional dark green
-    logo: 'https://images.unsplash.com/photo-1551601651-2a8f10b8a0f8?w=100&h=100&fit=crop',
+    logo: 'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=100&h=100&fit=crop',
     products: 316,
     rating: 4.7,
     category: 'Surgical Equipment',

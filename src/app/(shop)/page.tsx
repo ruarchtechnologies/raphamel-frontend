@@ -21,15 +21,15 @@
  *            Less JavaScript = faster initial load (like a pre-built Flutter app vs a web app).
  */
 
-import { HeroBanner }        from '@/components/home/HeroBanner';
-import { CategorySection }   from '@/components/home/CategorySection';
-import { FeaturedProducts }  from '@/components/home/FeaturedProducts';
-import { VendorSection }     from '@/components/home/VendorSection';
-import { PromoStrip }        from '@/components/home/PromoStrip';
-import type { Metadata }     from 'next';
+import { HeroBanner } from '@/components/home/HeroBanner';
+import { CategorySection } from '@/components/home/CategorySection';
+import { FeaturedProducts } from '@/components/home/FeaturedProducts';
+import { VendorSection } from '@/components/home/VendorSection';
+import { PromoStrip } from '@/components/home/PromoStrip';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Raphamel Health — Nigeria\'s B2B Medical Marketplace',
+  title: 'Raphamel — Nigeria\'s B2B Medical Marketplace',
   description:
     'Source hospital consumables, surgical equipment, diagnostic devices and PPE from NAFDAC-verified suppliers. Nigeria\'s leading B2B healthcare marketplace.',
 };

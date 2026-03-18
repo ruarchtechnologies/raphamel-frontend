@@ -1,18 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    // You can keep domains, but remotePatterns is the modern standard
-    domains: [
-      'localhost',
-      'res.cloudinary.com',
-      'via.placeholder.com',
-    ],
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        pathname: '**',
-      },
+      { protocol: 'http',  hostname: 'localhost' },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: 'via.placeholder.com' },
+      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '**' },
     ],
   },
   env: {

@@ -65,7 +65,7 @@ export const HEALTH_CATEGORIES: readonly CategoryEntity[] = [
     // IMAGE NEEDED: surgical-equipment.jpg | Size: 800x500
     // Content: Stainless steel surgical instruments laid on blue sterile drape
     image:
-      'https://images.unsplash.com/photo-1551601651-2a8f10b8a0f8?w=800&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=800&h=500&fit=crop',
     productCount: 1180,
   },
   {
@@ -156,7 +156,7 @@ export const HEALTH_CATEGORIES: readonly CategoryEntity[] = [
     // IMAGE NEEDED: mobility-orthopaedic-aids.jpg | Size: 800x500
     // Content: Lightweight wheelchair, forearm crutches and ankle brace on white background
     image:
-      'https://images.unsplash.com/photo-1552862750-5267da0f1f57?w=800&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=500&fit=crop',
     productCount: 940,
   },
   {
@@ -169,7 +169,7 @@ export const HEALTH_CATEGORIES: readonly CategoryEntity[] = [
     // IMAGE NEEDED: imaging-monitoring-equipment.jpg | Size: 800x500
     // Content: Patient vital signs monitor displaying ECG waveform, alongside ultrasound probe
     image:
-      'https://images.unsplash.com/photo-1530026186672-2b527be13174?w=800&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=500&fit=crop',
     productCount: 1120,
   },
 ] as const;

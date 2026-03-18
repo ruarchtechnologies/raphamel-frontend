@@ -55,13 +55,13 @@ const outfit = Outfit({
  * These values populate <title>, <meta name="description">, and Open Graph tags
  * that search engines and social media platforms read.
  *
- * `template: '%s | Raphamel Health'` means any page-level title like
- * "Hospital Consumables" becomes "Hospital Consumables | Raphamel Health".
+ * `template: '%s | Raphamel '` means any page-level title like
+ * "Hospital Consumables" becomes "Hospital Consumables | Raphamel ".
  */
 export const metadata: Metadata = {
   title: {
-    default: 'Raphamel Health — Nigeria\'s B2B Medical Marketplace',
-    template: '%s | Raphamel Health',
+    default: 'Raphamel — Nigeria\'s B2B Medical Marketplace',
+    template: '%s | Raphamel',
   },
   description:
     'Nigeria\'s B2B healthcare marketplace connecting verified medical suppliers with hospitals, clinics and pharmacies. Source hospital consumables, surgical equipment, diagnostic devices and more.',
@@ -73,12 +73,12 @@ export const metadata: Metadata = {
     'NAFDAC certified suppliers',
     'diagnostic devices Nigeria',
     'medical equipment suppliers',
-    'raphamel health',
+    'raphamel',
   ],
   openGraph: {
     type: 'website',
     locale: 'en_NG',
-    siteName: 'Raphamel Health Marketplace',
+    siteName: 'Raphamel Marketplace',
   },
   robots: {
     index: true,
@@ -97,7 +97,7 @@ export default function RootLayout({
    *     MultiProvider(
    *       providers: [...],
    *       child: MaterialApp(
-   *         title: 'Raphamel Health',
+   *         title: 'Raphamel',
    *         theme: ThemeData(fontFamily: 'Outfit'),
    *         home: children,
    *       ),

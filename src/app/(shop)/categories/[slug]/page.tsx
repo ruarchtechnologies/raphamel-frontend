@@ -65,7 +65,7 @@ export async function generateMetadata(
   const category = findCategoryBySlug(params.slug);
   if (!category) return {};
   return {
-    title: `${category.name} | Raphamel Health`,
+    title: `${category.name} | Raphamel`,
     description: category.description,
   };
 }
@@ -119,7 +119,7 @@ const CATEGORY_PRODUCTS: Record<string, ProductCardData[]> = {
       name: 'Stainless Steel Scalpel Handle Set — #3 #4 #7',
       price: 35000, compareAtPrice: 45000,
       // IMAGE NEEDED: product-scalpel-set.jpg | Size: 400x500
-      image: 'https://images.unsplash.com/photo-1551601651-2a8f10b8a0f8?w=400&h=500&fit=crop',
+      image: 'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=400&h=500&fit=crop',
       rating: 4.8, reviewCount: 67, vendorName: 'SurgiTech Africa',
     },
     {
@@ -127,7 +127,7 @@ const CATEGORY_PRODUCTS: Record<string, ProductCardData[]> = {
       name: 'Mayo-Hegar Needle Holder — 8 inch, Tungsten Carbide Insert',
       price: 48000,
       // IMAGE NEEDED: product-needle-holder.jpg | Size: 400x500
-      image: 'https://images.unsplash.com/photo-1551601651-2a8f10b8a0f8?w=400&h=500&fit=crop',
+      image: 'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=400&h=500&fit=crop',
       rating: 4.7, reviewCount: 44, vendorName: 'SurgiTech Africa', isNew: true,
     },
   ],
@@ -223,7 +223,7 @@ export default function CategoryDetailPage({ params }: Props) {
         <div className="container relative z-10">
           <Breadcrumb
             items={[
-              { label: 'Home',       href: '/' },
+              { label: 'Home', href: '/' },
               { label: 'Categories', href: '/categories' },
               { label: category.name },
             ]}
