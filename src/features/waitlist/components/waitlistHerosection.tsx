@@ -29,7 +29,7 @@ export function WaitlistHeroSection() {
           {/* <span className="badge">Early Access Opening Soon</span> */}
 
           <h1 className="headline">
-            Nigeria&apos;s{' '}
+            Africa&apos;s{' '}
             <span className="blue">B2B Medical</span>{' '}
             Marketplace is Launching Soon
           </h1>

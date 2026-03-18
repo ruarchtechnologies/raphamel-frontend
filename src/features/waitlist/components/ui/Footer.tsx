@@ -20,7 +20,7 @@ export function Footer() {
             className="text-sm"
             style={{ fontFamily: SANS, color: '#64748B' }}
           >
-            &copy; {new Date().getFullYear()} Raphamel.
+            &copy; {new Date().getFullYear()} Raphamel Healthcare Marketplace
           </p>
 
           <div className="flex gap-6">

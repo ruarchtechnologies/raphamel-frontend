@@ -33,15 +33,7 @@
 }
 
 .glow-yellow {
-  position: absolute;
-  bottom: -100px;
-  right: -100px;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: rgba(250, 204, 21, 0.14);
-  filter: blur(130px);
-  pointer-events: none;
+  display: none;
 }
 
 .hero-container {
