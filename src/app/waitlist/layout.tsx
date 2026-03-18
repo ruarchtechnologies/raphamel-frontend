@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   description:
     "Be first to access Nigeria's B2B medical marketplace. Join the waitlist and get early access to 15,000+ NAFDAC-verified medical products.",
   robots: { index: true, follow: true },
+  icons: {
+    icon: '/images/logo.png',
+  },
 };
 
 export default function WaitlistLayout({ children }: { children: React.ReactNode }) {
