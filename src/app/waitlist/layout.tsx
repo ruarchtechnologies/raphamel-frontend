@@ -28,6 +28,16 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: '/favicon.png', type: 'image/png' }],
   },
+  openGraph: {
+    title: "Join the Waitlist | Raphamel",
+    description: "Be first to access Africa's B2B medical marketplace.",
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Join the Waitlist | Raphamel",
+    description: "Be first to access Africa's B2B medical marketplace.",
+  },
 };
 
 export default function WaitlistLayout({ children }: { children: React.ReactNode }) {
