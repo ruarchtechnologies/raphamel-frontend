@@ -1,9 +1,24 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,700&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap');
 
 .hero-root {
   position: relative;
   min-height: 100vh;
-  padding: 96px 0 64px;
+  padding: 140px 0 20px;
   overflow: hidden;
   background: linear-gradient(135deg, #060E1C 0%, #0A1628 50%, #0E2444 100%);
   font-family: 'DM Sans', sans-serif;
@@ -48,12 +63,49 @@
 }
 
 @media (max-width: 1024px) {
+  .hero-root {
+    min-height: auto;
+    padding: 100px 0 40px;
+  }
+
   .hero-container {
     grid-template-columns: 1fr;
+    padding: 0 24px;
   }
 
   .dashboard-col {
     display: none;
+  }
+
+  .left-col {
+    align-items: center;
+    text-align: center;
+  }
+
+  .subheadline {
+    margin: 0 auto;
+  }
+
+  .toggle-wrap {
+    margin: 0 auto;
+  }
+
+  .form-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .email-input {
+    min-width: 0;
+    flex: 1 1 160px;
+  }
+
+  .cta-btn {
+    flex-shrink: 0;
+  }
+
+  .avatar-row {
+    justify-content: center;
   }
 }
 
