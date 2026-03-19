@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import './waitlistHero.css';
+import { submitToSheets } from './ui/WaitlistEmailInput';
 
 const avatars = [
   'https://images.unsplash.com/photo-1605369473971-c5e417ac3220?w=80&h=80&fit=crop&crop=face',
@@ -16,6 +17,8 @@ export function WaitlistHeroSection() {
   const [activeTab, setActiveTab] = useState('buyer');
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
 
   return (
     <section className="hero-root">
@@ -59,20 +62,46 @@ export function WaitlistHeroSection() {
               You&apos;re on the list! We&apos;ll be in touch soon.
             </div>
           ) : (
-            <div className="form-row">
-              <input
-                type="email"
-                className="email-input"
-                placeholder="Enter your work email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <button
-                className="cta-btn"
-                onClick={() => email && setSubmitted(true)}
-              >
-                Join Waitlist
-              </button>
+            <div id="hero-email">
+              <div className="form-row" style={{ borderColor: emailError ? 'rgba(244,63,94,0.6)' : undefined }}>
+                <input
+                  type="email"
+                  className="email-input"
+                  placeholder="Enter your work email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (emailError) setEmailError('');
+                  }}
+                />
+                <button
+                  className="cta-btn"
+                  disabled={loading}
+                  onClick={async () => {
+                    if (loading) return;
+                    if (!email) { setEmailError('Email is required'); return; }
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setEmailError('Please enter a valid email'); return; }
+                    setEmailError('');
+                    setLoading(true);
+                    try { await submitToSheets(email, activeTab); } catch { /* no-cors */ }
+                    setLoading(false);
+                    setSubmitted(true);
+                  }}
+                  style={{ opacity: loading ? 0.8 : 1 }}
+                >
+                  {loading ? (
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ animation: 'spin 0.8s linear infinite', display: 'inline-block' }}>
+                      <circle cx="10" cy="10" r="8" stroke="rgba(255,255,255,0.3)" strokeWidth="2.5" />
+                      <path d="M10 2a8 8 0 0 1 8 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />
+                    </svg>
+                  ) : 'Join Waitlist'}
+                </button>
+              </div>
+              {emailError && (
+                <p style={{ color: '#f43f5e', fontSize: '12px', marginTop: '6px', fontFamily: 'DM Sans, sans-serif' }}>
+                  {emailError}
+                </p>
+              )}
             </div>
           )}
 

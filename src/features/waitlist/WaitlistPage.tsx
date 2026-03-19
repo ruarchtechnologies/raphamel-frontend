@@ -15,7 +15,7 @@ export function WaitlistPage() {
       <TrustBar />
       <ValuePropsSection />
       <HowItWorksSection />
-      {/* <StatsBand /> */}
+      <StatsBand />
       <FinalCTA />
       <Footer />
     </div>

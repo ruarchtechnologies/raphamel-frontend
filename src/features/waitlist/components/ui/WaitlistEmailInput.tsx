@@ -10,13 +10,13 @@ export const schema = z.object({
 });
 export type FormData = z.infer<typeof schema>;
 
-export async function submitToSheets(email: string, referral: string): Promise<void> {
+export async function submitToSheets(email: string, role: string): Promise<void> {
   const webhookUrl = process.env.NEXT_PUBLIC_SHEETS_WEBHOOK_URL;
   if (!webhookUrl) return;
+
   await fetch(webhookUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ email, timestamp: new Date().toISOString(), referral }),
+    body: JSON.stringify({ email, role, timestamp: new Date().toISOString() }),
     mode: 'no-cors',
   });
 }
@@ -29,8 +29,7 @@ export function HeroEmailInput({ onSuccess, activeTab }: { onSuccess: () => void
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
-    const referral = typeof window !== 'undefined' ? document.referrer || 'direct' : 'direct';
-    try { await submitToSheets(data.email, referral); } catch { /* no-cors */ }
+    try { await submitToSheets(data.email, activeTab); } catch { /* no-cors */ }
     onSuccess();
   };
 
