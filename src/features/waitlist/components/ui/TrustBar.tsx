@@ -2,7 +2,7 @@ import { SANS, MONO } from '../../fonts';
 
 export function TrustBar() {
   return (
-    <section style={{ background: '#F8FAFC' }} className="py-8">
+    <section style={{ background: '#FAFAF8' }} className="py-8">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
           <div

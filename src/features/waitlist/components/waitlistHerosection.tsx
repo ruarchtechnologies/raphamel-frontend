@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import './waitlistHero.css';
 import { submitToSheets } from './ui/WaitlistEmailInput';
+import { MONO, SANS } from '../fonts';
 
 const avatars = [
   'https://images.unsplash.com/photo-1605369473971-c5e417ac3220?w=80&h=80&fit=crop&crop=face',
@@ -13,9 +15,13 @@ const avatars = [
 
 const barHeights = [40, 65, 55, 80, 70, 90, 75];
 
-export function WaitlistHeroSection() {
-  const [activeTab, setActiveTab] = useState('buyer');
-  const [email, setEmail] = useState('');
+interface Props {
+  activeTab: 'buyer' | 'supplier';
+  setActiveTab: (tab: 'buyer' | 'supplier') => void;
+}
+
+export function WaitlistHeroSection({ activeTab, setActiveTab }: Props) {
+  const [email, setEmail] = useState<string>('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
@@ -26,11 +32,21 @@ export function WaitlistHeroSection() {
       <div className="glow-blue" />
       <div className="glow-yellow" />
 
+      {/* NAV ROW — full width, top of hero */}
+      <div className="hero-nav">
+        <Link href="/" className="flex items-center rounded-full" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)', padding: '6px 24px 6px 4px', gap: '2px' }}>
+          <img src="/images/logo.png" alt="Raphamel" className="h-16 w-auto" />
+          <span className="font-bold text-white text-3xl pl-1" style={{ fontFamily: SANS }}>Raphamel</span>
+        </Link>
+        <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: MONO, background: 'rgba(250,204,21,0.1)', border: '1px solid rgba(250,204,21,0.2)', color: '#FACC15' }}>
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#FACC15' }} />
+          Now Accepting Early Members
+        </div>
+      </div>
+
       <div className="hero-container">
         {/* LEFT */}
         <div className="left-col">
-          {/* <span className="badge">Early Access Opening Soon</span> */}
-
           <h1 className="headline">
             Africa&apos;s{' '}
             <span className="blue">B2B Medical</span>{' '}

@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -18,10 +19,19 @@ html, body {
 .hero-root {
   position: relative;
   min-height: 100vh;
-  padding: 140px 0 20px;
+  padding: 0 0 20px;
   overflow: hidden;
   background: linear-gradient(135deg, #060E1C 0%, #0A1628 50%, #0E2444 100%);
   font-family: 'DM Sans', sans-serif;
+}
+
+.hero-nav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 48px;
 }
 
 .grid-overlay {
@@ -55,7 +65,7 @@ html, body {
   position: relative;
   /* max-width: 1200px; */
   margin: 0 auto;
-  padding: 0 48px;
+  padding: 80px 48px 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 64px;
@@ -65,12 +75,16 @@ html, body {
 @media (max-width: 1024px) {
   .hero-root {
     min-height: auto;
-    padding: 100px 0 40px;
+    padding: 0 0 40px;
+  }
+
+  .hero-nav {
+    padding: 20px 24px;
   }
 
   .hero-container {
     grid-template-columns: 1fr;
-    padding: 0 24px;
+    padding: 48px 24px 0;
   }
 
   .dashboard-col {
@@ -132,8 +146,8 @@ html, body {
 }
 
 .headline {
-  font-family: 'Fraunces', serif;
-  font-size: clamp(48px, 6vw, 72px);
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(45px, 6vw, 72px);
   font-weight: 900;
   color: #fff;
   line-height: 1.05;
@@ -540,6 +554,11 @@ html, body {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
