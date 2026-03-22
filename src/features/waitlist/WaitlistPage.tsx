@@ -6,7 +6,7 @@ import { TrustBar } from './components/ui/TrustBar';
 import { CategoriesPreviewSection } from './components/CategoriesPreviewSection';
 import { ValuePropsSection } from './components/valuePropssection';
 import { HowItWorksSection } from './components/howItWorkssection';
-import { FinalCTA } from './components/ui/FinalCTA';
+import { EarlyAccessSection } from './components/EarlyAccessSection';
 import { Footer } from './components/ui/Footer';
 
 export function WaitlistPage() {
@@ -14,12 +14,12 @@ export function WaitlistPage() {
 
   return (
     <div className="min-h-screen" style={{ background: '#060E1C' }}>
-      <WaitlistHeroSection activeTab={activeTab} setActiveTab={setActiveTab} />
+      <WaitlistHeroSection />
       <TrustBar />
       <CategoriesPreviewSection />
       <ValuePropsSection />
       <HowItWorksSection activeTab={activeTab} setActiveTab={setActiveTab} />
-      <FinalCTA />
+      <EarlyAccessSection activeTab={activeTab} setActiveTab={setActiveTab} />
       <Footer />
     </div>
   );

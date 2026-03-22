@@ -43,7 +43,7 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
             background: 'linear-gradient(160deg, #080F1E 0%, #0B1830 45%, #0D2040 100%)',
             borderRadius: '32px',
             padding: 'clamp(40px, 6vw, 72px)',
-            boxShadow: '0 32px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05)',
+            boxShadow: 'none',
             position: 'relative',
             overflow: 'hidden',
           }}
@@ -319,7 +319,7 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
             </div>
 
             {/* RIGHT — Image card */}
-            <div className="w-full lg:flex-1" style={{ minHeight: '300px' }}>
+            <div className="w-full lg:flex-1">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeHowTab + '-img'}
@@ -332,8 +332,8 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
                     overflow: 'hidden',
                     borderRadius: '20px',
                     width: '100%',
-                    height: '0',
-                    paddingBottom: '62%',
+                    aspectRatio: '16 / 10',
+                    minHeight: '240px',
                     border: '1px solid rgba(255,255,255,0.08)',
                     boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
                   }}
@@ -378,12 +378,12 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
                   <div
                     style={{
                       position: 'absolute',
-                      top: '16px',
-                      left: '16px',
+                      top: 'clamp(8px, 2vw, 16px)',
+                      left: 'clamp(8px, 2vw, 16px)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '7px',
-                      padding: '6px 14px',
+                      gap: 'clamp(4px, 1vw, 7px)',
+                      padding: 'clamp(4px, 1vw, 6px) clamp(8px, 2vw, 14px)',
                       borderRadius: '999px',
                       background: 'rgba(6,14,28,0.55)',
                       border: '1px solid rgba(255,255,255,0.15)',
@@ -403,7 +403,7 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
                     <span
                       style={{
                         fontFamily: MONO,
-                        fontSize: '10px',
+                        fontSize: 'clamp(8px, 1.5vw, 10px)',
                         fontWeight: 600,
                         color: '#fff',
                         letterSpacing: '0.09em',

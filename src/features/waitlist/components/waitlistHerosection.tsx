@@ -1,30 +1,13 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import './waitlistHero.css';
-import { submitToSheets } from './ui/WaitlistEmailInput';
 import { MONO, SANS } from '../fonts';
 
-const avatars = [
-  'https://images.unsplash.com/photo-1605369473971-c5e417ac3220?w=80&h=80&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1655720357761-f18ea9e5e7e6?w=80&h=80&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1762237798212-bcc000c00891?w=80&h=80&fit=crop&crop=face',
-  'https://images.unsplash.com/photo-1694787590597-ba49c7cdc2cc?w=80&h=80&fit=crop&crop=face',
-];
 
 const barHeights = [40, 65, 55, 80, 70, 90, 75];
 
-interface Props {
-  activeTab: 'buyer' | 'supplier';
-  setActiveTab: (tab: 'buyer' | 'supplier') => void;
-}
-
-export function WaitlistHeroSection({ activeTab, setActiveTab }: Props) {
-  const [email, setEmail] = useState<string>('');
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [emailError, setEmailError] = useState('');
+export function WaitlistHeroSection() {
 
   return (
     <section className="hero-root">
@@ -57,82 +40,26 @@ export function WaitlistHeroSection({ activeTab, setActiveTab }: Props) {
             Connect verified suppliers with healthcare facilities. Transparent pricing, reliable delivery, NAFDAC compliance built-in.
           </p>
 
-          <div className="toggle-wrap">
-            {(['buyer', 'supplier'] as const).map((tab) => (
-              <button
-                key={tab}
-                className={`toggle-btn${activeTab === tab ? ' active' : ''}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab === 'buyer' ? "I'm a Buyer" : "I'm a Supplier"}
-              </button>
-            ))}
-          </div>
+          <button
+            onClick={() => document.getElementById('early-access')?.scrollIntoView({ behavior: 'smooth' })}
+            style={{
+              padding: '10px 28px',
+              borderRadius: '999px',
+              background: '#0071DC',
+              color: '#fff',
+              fontFamily: SANS,
+              fontSize: '14px',
+              fontWeight: 600,
+              border: 'none',
+              cursor: 'pointer',
+              width: 'fit-content',
+              boxShadow: '0 4px 20px rgba(0,113,220,0.45)',
+              transition: 'all 0.25s ease',
+            }}
+          >
+            Reserve Your Early Access
+          </button>
 
-          {submitted ? (
-            <div className="success-state">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <circle cx="10" cy="10" r="9" stroke="#22C55E" strokeWidth="1.5" />
-                <path d="M6 10l3 3 5-5" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              You&apos;re on the list! We&apos;ll be in touch soon.
-            </div>
-          ) : (
-            <div id="hero-email">
-              <div className="form-row" style={{ borderColor: emailError ? 'rgba(244,63,94,0.6)' : undefined }}>
-                <input
-                  type="email"
-                  className="email-input"
-                  placeholder="Enter your work email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (emailError) setEmailError('');
-                  }}
-                />
-                <button
-                  className="cta-btn"
-                  disabled={loading}
-                  onClick={async () => {
-                    if (loading) return;
-                    if (!email) { setEmailError('Email is required'); return; }
-                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setEmailError('Please enter a valid email'); return; }
-                    setEmailError('');
-                    setLoading(true);
-                    try { await submitToSheets(email, activeTab); } catch { /* no-cors */ }
-                    setLoading(false);
-                    setSubmitted(true);
-                  }}
-                  style={{ opacity: loading ? 0.8 : 1 }}
-                >
-                  {loading ? (
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ animation: 'spin 0.8s linear infinite', display: 'inline-block' }}>
-                      <circle cx="10" cy="10" r="8" stroke="rgba(255,255,255,0.3)" strokeWidth="2.5" />
-                      <path d="M10 2a8 8 0 0 1 8 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />
-                    </svg>
-                  ) : 'Join Waitlist'}
-                </button>
-              </div>
-              {emailError && (
-                <p style={{ color: '#f43f5e', fontSize: '12px', marginTop: '6px', fontFamily: 'DM Sans, sans-serif' }}>
-                  {emailError}
-                </p>
-              )}
-            </div>
-          )}
-
-          {!submitted && (
-            <div className="avatar-row">
-              <div className="avatar-stack">
-                {avatars.map((src, i) => (
-                  <img key={i} src={src} alt="" />
-                ))}
-              </div>
-              <p className="avatar-text">
-                <strong>1,200+</strong> already waiting
-              </p>
-            </div>
-          )}
         </div>
 
         {/* RIGHT — Dashboard Card */}

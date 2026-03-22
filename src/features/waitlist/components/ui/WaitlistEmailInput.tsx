@@ -10,13 +10,36 @@ export const schema = z.object({
 });
 export type FormData = z.infer<typeof schema>;
 
-export async function submitToSheets(email: string, role: string): Promise<void> {
+export interface WaitlistPayload {
+  email: string;
+  role: 'buyer' | 'supplier';
+  fullName: string;
+  phone?: string;
+  // Buyer-only
+  facilityName?: string;
+  facilityType?: string;
+  state?: string;
+  monthlySpend?: string;
+  topCategories?: string[];
+  // Supplier-only
+  companyName?: string;
+  productCategories?: string[];
+  nafdacStatus?: string;
+  yearsInBusiness?: string;
+}
+
+export async function submitToSheets(payload: WaitlistPayload | string, role?: string): Promise<void> {
   const webhookUrl = process.env.NEXT_PUBLIC_SHEETS_WEBHOOK_URL;
   if (!webhookUrl) return;
 
+  const data: WaitlistPayload =
+    typeof payload === 'string'
+      ? { email: payload, role: (role as 'buyer' | 'supplier') ?? 'buyer', fullName: '' }
+      : payload;
+
   await fetch(webhookUrl, {
     method: 'POST',
-    body: JSON.stringify({ email, role, timestamp: new Date().toISOString() }),
+    body: JSON.stringify({ ...data, timestamp: new Date().toISOString() }),
     mode: 'no-cors',
   });
 }
