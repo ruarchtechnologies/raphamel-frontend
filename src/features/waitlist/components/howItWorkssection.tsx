@@ -1,33 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useInView } from '@/hooks/useInView';
-import { BUYER_STEPS, SUPPLIER_STEPS } from '../constants';
+import { BUYER_STEPS } from '../constants';
 import { SANS, MONO } from '../fonts';
 
-interface Props {
-  activeTab: 'buyer' | 'supplier';
-  setActiveTab: (tab: 'buyer' | 'supplier') => void;
-}
-
-const TAB_IMAGES = {
-  buyers: '/images/how-buyer.png',
-  suppliers: '/images/how-supplier.png',
-};
-
-export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
+export function HowItWorksSection() {
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
-  const activeHowTab = activeTab === 'buyer' ? 'buyers' : 'suppliers';
-  const setActiveHowTab = (tab: 'buyers' | 'suppliers') =>
-    setActiveTab(tab === 'buyers' ? 'buyer' : 'supplier');
   const howRef = useInView({ threshold: 0.1 });
-  const howSteps = activeHowTab === 'buyers' ? BUYER_STEPS : SUPPLIER_STEPS;
-
-  const tabs = [
-    { id: 'buyers', label: 'For Buyers' },
-    { id: 'suppliers', label: 'For Suppliers' },
-  ] as const;
+  const howSteps = BUYER_STEPS;
 
   return (
     <section
@@ -97,66 +79,10 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
                 <span style={{ color: '#FACC15' }}>Step by Step</span>
               </motion.h2>
 
-              {/* Tab switcher */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={howRef.isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-                transition={{ duration: 0.45, delay: 0.1 }}
-                style={{ marginBottom: '16px' }}
-              >
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    padding: '4px',
-                    borderRadius: '999px',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                  }}
-                >
-                  {tabs.map((tab) => {
-                    const isActive = activeHowTab === tab.id;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveHowTab(tab.id)}
-                        style={{
-                          position: 'relative',
-                          padding: '7px 20px',
-                          borderRadius: '999px',
-                          fontFamily: SANS,
-                          fontSize: '13px',
-                          fontWeight: isActive ? 700 : 500,
-                          color: isActive ? '#0B1830' : 'rgba(255,255,255,0.55)',
-                          background: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          outline: 'none',
-                          transition: 'color 0.2s ease',
-                        }}
-                      >
-                        {isActive && (
-                          <motion.div
-                            layoutId="how-pill"
-                            style={{
-                              position: 'absolute',
-                              inset: 0,
-                              borderRadius: '999px',
-                              background: '#fff',
-                            }}
-                            transition={{ type: 'spring', stiffness: 440, damping: 34 }}
-                          />
-                        )}
-                        <span style={{ position: 'relative', zIndex: 1 }}>{tab.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-
               <motion.p
                 initial={{ opacity: 0, y: 14 }}
                 animate={howRef.isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
-                transition={{ duration: 0.5, delay: 0.15 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
                 style={{
                   fontFamily: SANS,
                   fontSize: '15px',
@@ -166,9 +92,7 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
                   margin: 0,
                 }}
               >
-                {activeHowTab === 'buyers'
-                  ? "Whether you're procuring for a hospital or clinic, Raphamel makes healthcare supply seamless."
-                  : "List your inventory, get verified, and start reaching healthcare facilities across Nigeria."}
+                {"Whether you're procuring for a hospital or clinic, Raphamel makes healthcare supply seamless."}
               </motion.p>
             </div>
           </div>
@@ -177,15 +101,8 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
           <div className="flex flex-col lg:flex-row" style={{ gap: 'clamp(32px, 5vw, 72px)', alignItems: 'stretch' }}>
             {/* LEFT — Timeline steps */}
             <div style={{ flex: '1 1 52%' }}>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeHowTab}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.28 }}
-                >
-                  {howSteps.map((step, i) => {
+              <div>
+                {howSteps.map((step, i) => {
                     const isHovered = hoveredStep === i;
                     const isLast = i === howSteps.length - 1;
                     return (
@@ -313,16 +230,13 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
                         </div>
                       </motion.div>
                     );
-                  })}
-                </motion.div>
-              </AnimatePresence>
+                })}
+              </div>
             </div>
 
             {/* RIGHT — Image card */}
             <div className="w-full lg:flex-1">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeHowTab + '-img'}
+              <motion.div
                   initial={{ opacity: 0, scale: 0.97, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.97, y: -10 }}
@@ -339,7 +253,7 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
                   }}
                 >
                   <img
-                    src={TAB_IMAGES[activeHowTab]}
+                    src="/images/how-buyer.png"
                     alt=""
                     style={{
                       position: 'absolute',
@@ -410,12 +324,11 @@ export function HowItWorksSection({ activeTab, setActiveTab }: Props) {
                         textTransform: 'uppercase',
                       }}
                     >
-                      {activeHowTab === 'buyers' ? 'Healthcare Buyer' : 'Verified Supplier'}
+                      {'Healthcare Buyer'}
                     </span>
                   </div>
 
                 </motion.div>
-              </AnimatePresence>
             </div>
           </div>
         </div>

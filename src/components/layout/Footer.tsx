@@ -47,6 +47,7 @@ const LINKS = {
     { label: 'PPE', href: '/categories/personal-protective-equipment' },
     { label: 'Lab Supplies', href: '/categories/laboratory-supplies' },
     { label: 'Rehabilitation', href: '/categories/rehabilitation-equipment' },
+    { label: 'Topicals', href: '/categories/topicals' },
   ],
 };
 

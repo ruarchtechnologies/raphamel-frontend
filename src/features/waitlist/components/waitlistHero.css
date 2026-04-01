@@ -34,6 +34,16 @@ body {
   padding: 24px 48px;
 }
 
+.hero-early-badge {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .hero-early-badge {
+    display: flex;
+  }
+}
+
 .grid-overlay {
   position: absolute;
   inset: 0;
@@ -638,7 +648,7 @@ body {
     grid-template-areas:
       "ca ca cb cd"
       "ca ca cc ce"
-      "cf cg cg ch"
+      "cf cg ch ck"
       "ci ci cj cj";
     gap: 12px;
     grid-auto-rows: unset;
@@ -682,6 +692,10 @@ body {
 
   .cat-j {
     grid-area: cj;
+  }
+
+  .cat-k {
+    grid-area: ck;
   }
 }
 

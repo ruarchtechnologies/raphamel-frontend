@@ -6,9 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
 import { SANS, MONO } from '../fonts';
-import { submitToSheets, WaitlistPayload } from './ui/WaitlistEmailInput';
+import { useWaitlistSubmit, type BuyerPayload } from '@/hooks/useWaitlistSubmit';
 import { HEALTH_CATEGORIES } from '@/domain/entities/category.entity';
 
 // ── Static data ──────────────────────────────────────────────────────────────
@@ -40,23 +39,7 @@ const buyerSchema = z.object({
   topCategories: z.array(z.string()).min(1, 'Select at least one category'),
 });
 
-const supplierSchema = z.object({
-  fullName: z.string().min(2, 'Full name is required'),
-  email: z.string().email('Enter a valid email'),
-  phone: z.string().optional(),
-  companyName: z.string().min(2, 'Company name is required'),
-  state: z.string().min(1, 'Select a state'),
-  productCategories: z.array(z.string()).min(1, 'Select at least one category'),
-  nafdacStatus: z.enum(['yes', 'no', 'in-progress'], {
-    errorMap: () => ({ message: 'Select NAFDAC registration status' }),
-  }),
-  yearsInBusiness: z.enum(['less-1', '1-3', '3-10', 'above-10'], {
-    errorMap: () => ({ message: 'Select years in business' }),
-  }),
-});
-
 type BuyerFormData = z.infer<typeof buyerSchema>;
-type SupplierFormData = z.infer<typeof supplierSchema>;
 
 // ── Local primitives ─────────────────────────────────────────────────────────
 
@@ -101,10 +84,12 @@ function DarkInput({ error, ...props }: React.InputHTMLAttributes<HTMLInputEleme
         transition: 'border-color 0.2s, box-shadow 0.2s',
       }}
       onFocus={e => {
+        props.onFocus?.(e);
         e.currentTarget.style.borderColor = error ? 'rgba(248,113,113,0.7)' : '#0071DC';
         e.currentTarget.style.boxShadow = error ? '0 0 0 3px rgba(248,113,113,0.1)' : '0 0 0 3px rgba(0,113,220,0.12)';
       }}
       onBlur={e => {
+        props.onBlur?.(e);
         e.currentTarget.style.borderColor = error ? 'rgba(248,113,113,0.5)' : 'rgba(255,255,255,0.1)';
         e.currentTarget.style.boxShadow = 'none';
       }}
@@ -135,6 +120,9 @@ function DarkSelect({ error, children, ...props }: React.SelectHTMLAttributes<HT
         boxSizing: 'border-box',
         transition: 'border-color 0.2s',
       }}
+
+      onFocus={(e) => props.onFocus?.(e)}
+      onBlur={(e) => props.onBlur?.(e)}
     >
       {children}
     </select>
@@ -311,29 +299,40 @@ function SubmitBtn({ loading }: { loading: boolean }) {
 // ── Buyer Form ────────────────────────────────────────────────────────────────
 
 function BuyerForm({ onSuccess }: { onSuccess: () => void }) {
+  const { submit, loading, error } = useWaitlistSubmit();
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<BuyerFormData>({
     resolver: zodResolver(buyerSchema),
-    defaultValues: { topCategories: [] },
+    mode: 'onTouched',
+    defaultValues: {
+      fullName: '',
+      email: '',
+      phone: '',
+      facilityName: '',
+      facilityType: undefined,
+      state: '',
+      monthlySpend: undefined,
+      topCategories: [],
+    },
   });
 
   const onSubmit = async (data: BuyerFormData) => {
-    const payload: WaitlistPayload = {
-      role: 'buyer',
+    const payload: BuyerPayload = {
+      type: 'buyer',
       fullName: data.fullName,
-      email: data.email,
+      workEmail: data.email,
       phone: data.phone,
       facilityName: data.facilityName,
       facilityType: data.facilityType,
       state: data.state,
       monthlySpend: data.monthlySpend,
-      topCategories: data.topCategories,
+      categories: data.topCategories,
     };
-    try { await submitToSheets(payload); } catch { /* no-cors */ }
+    await submit(payload);
     onSuccess();
   };
 
@@ -377,8 +376,9 @@ function BuyerForm({ onSuccess }: { onSuccess: () => void }) {
             <Controller
               name="facilityType"
               control={control}
+              defaultValue={undefined}
               render={({ field }) => (
-                <DarkSelect {...field} error={errors.facilityType?.message}>
+                <DarkSelect {...field} value={field.value ?? ''} error={errors.facilityType?.message}>
                   <option value="" disabled>Select type…</option>
                   <option value="hospital">Hospital</option>
                   <option value="clinic">Clinic</option>
@@ -397,7 +397,7 @@ function BuyerForm({ onSuccess }: { onSuccess: () => void }) {
               name="state"
               control={control}
               render={({ field }) => (
-                <DarkSelect {...field} error={errors.state?.message}>
+                <DarkSelect {...field} value={field.value ?? ''} error={errors.state?.message}>
                   <option value="" disabled>Select state…</option>
                   {NIGERIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                 </DarkSelect>
@@ -446,151 +446,8 @@ function BuyerForm({ onSuccess }: { onSuccess: () => void }) {
           />
         </div>
 
-        <SubmitBtn loading={isSubmitting} />
-      </div>
-    </form>
-  );
-}
-
-// ── Supplier Form ─────────────────────────────────────────────────────────────
-
-function SupplierForm({ onSuccess }: { onSuccess: () => void }) {
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors, isSubmitting },
-  } = useForm<SupplierFormData>({
-    resolver: zodResolver(supplierSchema),
-    defaultValues: { productCategories: [] },
-  });
-
-  const onSubmit = async (data: SupplierFormData) => {
-    const payload: WaitlistPayload = {
-      role: 'supplier',
-      fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
-      companyName: data.companyName,
-      state: data.state,
-      productCategories: data.productCategories,
-      nafdacStatus: data.nafdacStatus,
-      yearsInBusiness: data.yearsInBusiness,
-    };
-    try { await submitToSheets(payload); } catch { /* no-cors */ }
-    onSuccess();
-  };
-
-  const col2Mobile = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' } as React.CSSProperties;
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-        {/* Name + Email */}
-        <div style={col2Mobile}>
-          <div>
-            <FieldLabel required>Full Name</FieldLabel>
-            <DarkInput {...register('fullName')} placeholder="Chidi Nwosu" error={errors.fullName?.message} />
-            <FieldError message={errors.fullName?.message} />
-          </div>
-          <div>
-            <FieldLabel required>Work Email</FieldLabel>
-            <DarkInput {...register('email')} type="email" placeholder="chidi@medcompany.ng" error={errors.email?.message} />
-            <FieldError message={errors.email?.message} />
-          </div>
-        </div>
-
-        {/* Phone + Company */}
-        <div style={col2Mobile}>
-          <div>
-            <FieldLabel>Phone Number <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>(optional)</span></FieldLabel>
-            <DarkInput {...register('phone')} type="tel" placeholder="+234 802 345 6789" />
-          </div>
-          <div>
-            <FieldLabel required>Company Name</FieldLabel>
-            <DarkInput {...register('companyName')} placeholder="MedSupply Nigeria Ltd" error={errors.companyName?.message} />
-            <FieldError message={errors.companyName?.message} />
-          </div>
-        </div>
-
-        {/* State */}
-        <div style={{ maxWidth: '50%' }}>
-          <FieldLabel required>HQ State</FieldLabel>
-          <Controller
-            name="state"
-            control={control}
-            render={({ field }) => (
-              <DarkSelect {...field} error={errors.state?.message}>
-                <option value="" disabled>Select state…</option>
-                {NIGERIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-              </DarkSelect>
-            )}
-          />
-          <FieldError message={errors.state?.message} />
-        </div>
-
-        {/* Product Categories */}
-        <div>
-          <FieldLabel required>Product Categories You Supply</FieldLabel>
-          <Controller
-            name="productCategories"
-            control={control}
-            render={({ field }) => (
-              <DarkCheckboxGroup
-                options={CATEGORY_OPTIONS}
-                value={field.value ?? []}
-                onChange={field.onChange}
-                error={errors.productCategories?.message}
-              />
-            )}
-          />
-        </div>
-
-        {/* NAFDAC Status */}
-        <div>
-          <FieldLabel required>NAFDAC Registration Status</FieldLabel>
-          <Controller
-            name="nafdacStatus"
-            control={control}
-            render={({ field }) => (
-              <DarkRadioGroup
-                options={[
-                  { value: 'yes', label: 'Yes, registered' },
-                  { value: 'in-progress', label: 'In progress' },
-                  { value: 'no', label: 'Not yet' },
-                ]}
-                value={field.value ?? ''}
-                onChange={field.onChange}
-                error={errors.nafdacStatus?.message}
-              />
-            )}
-          />
-        </div>
-
-        {/* Years in Business */}
-        <div>
-          <FieldLabel required>Years in Business</FieldLabel>
-          <Controller
-            name="yearsInBusiness"
-            control={control}
-            render={({ field }) => (
-              <DarkRadioGroup
-                options={[
-                  { value: 'less-1', label: 'Less than 1 year' },
-                  { value: '1-3', label: '1 – 3 years' },
-                  { value: '3-10', label: '3 – 10 years' },
-                  { value: 'above-10', label: '10+ years' },
-                ]}
-                value={field.value ?? ''}
-                onChange={field.onChange}
-                error={errors.yearsInBusiness?.message}
-              />
-            )}
-          />
-        </div>
-
-        <SubmitBtn loading={isSubmitting} />
+        {error && <FieldError message={error} />}
+        <SubmitBtn loading={loading} />
       </div>
     </form>
   );
@@ -598,7 +455,7 @@ function SupplierForm({ onSuccess }: { onSuccess: () => void }) {
 
 // ── Success state ─────────────────────────────────────────────────────────────
 
-function SuccessConfirmation({ role }: { role: 'buyer' | 'supplier' }) {
+function SuccessConfirmation() {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.96, y: 16 }}
@@ -665,9 +522,7 @@ function SuccessConfirmation({ role }: { role: 'buyer' | 'supplier' }) {
           lineHeight: 1.7,
           maxWidth: '400px',
         }}>
-          {role === 'buyer'
-            ? "We'll reach out as we approach launch with early access details and exclusive pricing for healthcare facilities."
-            : "We'll be in touch soon with onboarding details and your verified supplier profile setup."}
+          {"We'll reach out as we approach launch with early access details and exclusive pricing for healthcare facilities."}
         </p>
       </div>
 
@@ -698,18 +553,8 @@ function SuccessConfirmation({ role }: { role: 'buyer' | 'supplier' }) {
 
 // ── Main section ──────────────────────────────────────────────────────────────
 
-interface Props {
-  activeTab: 'buyer' | 'supplier';
-  setActiveTab: (tab: 'buyer' | 'supplier') => void;
-}
-
-export function EarlyAccessSection({ activeTab, setActiveTab }: Props) {
+export function EarlyAccessSection() {
   const [submitted, setSubmitted] = useState(false);
-
-  const tabs = [
-    { id: 'buyer' as const, label: "I'm a Buyer" },
-    { id: 'supplier' as const, label: "I'm a Supplier" },
-  ];
 
   return (
     <section
@@ -787,7 +632,7 @@ export function EarlyAccessSection({ activeTab, setActiveTab }: Props) {
               <AnimatePresence mode="wait">
                 {submitted ? (
                   <motion.div key="success" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <SuccessConfirmation role={activeTab} />
+                    <SuccessConfirmation />
                   </motion.div>
                 ) : (
                   <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -815,66 +660,11 @@ export function EarlyAccessSection({ activeTab, setActiveTab }: Props) {
                         <span style={{ color: '#FACC15' }}>Early Access</span>
                       </motion.h2>
 
-                      {/* Tab switcher */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 12 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.45, delay: 0.1 }}
-                        style={{ marginBottom: '14px' }}
-                      >
-                        <div style={{
-                          display: 'inline-flex',
-                          padding: '4px',
-                          borderRadius: '999px',
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                        }}>
-                          {tabs.map(tab => {
-                            const isActive = activeTab === tab.id;
-                            return (
-                              <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                style={{
-                                  position: 'relative',
-                                  padding: '7px 20px',
-                                  borderRadius: '999px',
-                                  fontFamily: SANS,
-                                  fontSize: '13px',
-                                  fontWeight: isActive ? 700 : 500,
-                                  color: isActive ? '#0B1830' : 'rgba(255,255,255,0.55)',
-                                  background: 'transparent',
-                                  border: 'none',
-                                  cursor: 'pointer',
-                                  outline: 'none',
-                                  transition: 'color 0.2s ease',
-                                }}
-                              >
-                                {isActive && (
-                                  <motion.div
-                                    layoutId="early-access-pill"
-                                    style={{
-                                      position: 'absolute',
-                                      inset: 0,
-                                      borderRadius: '999px',
-                                      background: '#fff',
-                                    }}
-                                    transition={{ type: 'spring', stiffness: 440, damping: 34 }}
-                                  />
-                                )}
-                                <span style={{ position: 'relative', zIndex: 1 }}>{tab.label}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-
                       <motion.p
                         initial={{ opacity: 0, y: 14 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 0.15 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
                         style={{
                           fontFamily: SANS,
                           fontSize: '14px',
@@ -884,27 +674,11 @@ export function EarlyAccessSection({ activeTab, setActiveTab }: Props) {
                           margin: 0,
                         }}
                       >
-                        {activeTab === 'buyer'
-                          ? 'Tell us about your facility so we can tailor your early access experience.'
-                          : 'Share a bit about your company so we can set up your verified supplier profile.'}
+                        Tell us about your facility so we can tailor your early access experience.
                       </motion.p>
                     </div>
 
-                    {/* Form with AnimatePresence for tab switch */}
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={activeTab}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.25 }}
-                      >
-                        {activeTab === 'buyer'
-                          ? <BuyerForm onSuccess={() => setSubmitted(true)} />
-                          : <SupplierForm onSuccess={() => setSubmitted(true)} />
-                        }
-                      </motion.div>
-                    </AnimatePresence>
+                    <BuyerForm onSuccess={() => setSubmitted(true)} />
 
                   </motion.div>
                 )}

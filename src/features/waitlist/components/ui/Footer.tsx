@@ -1,42 +1,63 @@
+'use client';
+
+import { useState } from 'react';
 import { SANS } from '../../fonts';
+import { LegalModal } from './LegalModal';
 
 export function Footer() {
+  const [openModal, setOpenModal] = useState<'privacy' | 'terms' | null>(null);
+
   return (
-    <footer
-      className="py-8"
-      style={{ background: '#060E1C', borderTop: '1px solid rgba(255,255,255,0.08)' }}
-    >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Logo */}
-          <div className="flex items-center gap-0.5">
-            <img src="/images/logo.png" alt="Raphamel" className="h-14 w-auto" />
-            <span className="font-bold text-white" style={{ fontFamily: SANS }}>
-              Raphamel
-            </span>
-          </div>
+    <>
+      <LegalModal type={openModal} onClose={() => setOpenModal(null)} />
 
-          <p
-            className="text-sm"
-            style={{ fontFamily: SANS, color: '#64748B' }}
-          >
-            &copy; {new Date().getFullYear()} Raphamel Healthcare Marketplace
-          </p>
+      <footer
+        className="py-8"
+        style={{ background: '#060E1C', borderTop: '1px solid rgba(255,255,255,0.08)' }}
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Logo */}
+            <div className="flex items-center gap-0.5">
+              <img src="/images/logo.png" alt="Raphamel" className="h-14 w-auto" />
+              <span className="font-bold text-white" style={{ fontFamily: SANS }}>
+                Raphamel
+              </span>
+            </div>
 
-          <div className="flex gap-6">
-            {['Privacy', 'Terms', 'Contact'].map((link) => (
+            <p
+              className="text-sm"
+              style={{ fontFamily: SANS, color: '#64748B' }}
+            >
+              &copy; {new Date().getFullYear()} Raphamel Healthcare Marketplace
+            </p>
+
+            <div className="flex gap-6">
+              <button
+                onClick={() => setOpenModal('privacy')}
+                className="text-sm transition-colors hover:text-white"
+                style={{ fontFamily: SANS, color: '#64748B', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                Privacy Policy
+              </button>
+              <button
+                onClick={() => setOpenModal('terms')}
+                className="text-sm transition-colors hover:text-white"
+                style={{ fontFamily: SANS, color: '#64748B', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              >
+                Terms of Service
+              </button>
               <a
-                key={link}
-                href="#"
+                href="mailto:raphamel.tech@gmail.com"
                 className="text-sm transition-colors hover:text-white"
                 style={{ fontFamily: SANS, color: '#64748B' }}
               >
-                {link}
+                Contact
               </a>
-            ))}
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }

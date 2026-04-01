@@ -21,10 +21,6 @@ export function WaitlistHeroSection() {
           <img src="/images/logo.png" alt="Raphamel" className="h-16 w-auto" />
           <span className="font-bold text-white text-3xl pl-1" style={{ fontFamily: SANS }}>Raphamel</span>
         </Link>
-        <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide" style={{ fontFamily: MONO, background: 'rgba(250,204,21,0.1)', border: '1px solid rgba(250,204,21,0.2)', color: '#FACC15' }}>
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#FACC15' }} />
-          Now Accepting Early Members
-        </div>
       </div>
 
       <div className="hero-container">
@@ -86,7 +82,7 @@ export function WaitlistHeroSection() {
                     <svg className="check-icon" viewBox="0 0 12 12" fill="none">
                       <path d="M2 6l3 3 5-5" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    MedSupply Nigeria
+                    Raphamel Health
                   </div>
                   <div className="price-row">
                     <span className="price">&#8358;45,000</span>

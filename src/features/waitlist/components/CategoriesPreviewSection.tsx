@@ -12,10 +12,11 @@ const TILES: { slug: string; cls: string; pos?: string }[] = [
   { slug: 'personal-protective-equipment', cls: 'cat-d', pos: 'center' },
   { slug: 'rehabilitation-equipment', cls: 'cat-e', pos: 'center' },
   { slug: 'laboratory-supplies', cls: 'cat-f', pos: 'center' },
-  { slug: 'first-aid-emergency', cls: 'cat-g', pos: 'center' },
+  { slug: 'pharmaceuticals', cls: 'cat-g', pos: 'center' },
   { slug: 'patient-care-products', cls: 'cat-h', pos: 'center' },
   { slug: 'imaging-monitoring-equipment', cls: 'cat-i', pos: 'center' },
   { slug: 'mobility-orthopaedic-aids', cls: 'cat-j', pos: 'center' },
+  { slug: 'topicals', cls: 'cat-k', pos: 'center' },
 ];
 
 export function CategoriesPreviewSection() {

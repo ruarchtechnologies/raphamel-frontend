@@ -135,13 +135,13 @@ export const HEALTH_CATEGORIES: readonly CategoryEntity[] = [
   },
   {
     id: 'cat-08',
-    name: 'First Aid & Emergency',
-    slug: 'first-aid-emergency',
+    name: 'Pharmaceuticals',
+    slug: 'pharmaceuticals',
     color: '#ffedd5', // Tailwind orange-100
     description:
-      'AEDs, defibrillators, trauma kits, emergency stretchers, oxygen masks and resuscitation equipment.',
-    // IMAGE NEEDED: first-aid-emergency.jpg | Size: 800x500
-    // Content: Open first aid kit with AED device and trauma supplies on red background
+      'Prescription drugs, OTC medications, antibiotics, vaccines, IV fluids and essential medicines for clinical and hospital use.',
+    // IMAGE NEEDED: pharmaceuticals.jpg | Size: 800x500
+    // Content: Assorted pharmaceutical products — blister packs, vials, IV bags on clean background
     image:
       'https://images.unsplash.com/photo-1576671081837-49000212a370?w=800&h=500&fit=crop',
     productCount: 730,
@@ -161,6 +161,19 @@ export const HEALTH_CATEGORIES: readonly CategoryEntity[] = [
   },
   {
     id: 'cat-10',
+    name: 'Topicals',
+    slug: 'topicals',
+    color: '#dcfce7', // Tailwind green-100
+    description:
+      'Antiseptic creams, wound ointments, medicated lotions, dermatological preparations and topical anaesthetics.',
+    // IMAGE NEEDED: topicals.jpg | Size: 800x500
+    // Content: Assorted topical creams, ointments and lotions on a clean background
+    image:
+      'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&h=500&fit=crop',
+    productCount: 890,
+  },
+  {
+    id: 'cat-11',
     name: 'Imaging & Monitoring Equipment',
     slug: 'imaging-monitoring-equipment',
     color: '#f1f5f9', // Tailwind slate-100

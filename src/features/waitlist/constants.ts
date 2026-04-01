@@ -10,8 +10,8 @@ export const AVATARS = [
 export const VALUE_CARDS = [
   {
     number: '01',
-    title: 'NAFDAC-Verified Suppliers',
-    description: 'Every supplier is vetted and verified to meet Nigerian pharmaceutical standards.',
+    title: 'NAFDAC-Verified Products',
+    description: 'Every product we carry is NAFDAC-registered and quality-checked to meet Nigerian pharmaceutical standards.',
     icon: ShieldCheck,
     color: {
       bg: 'rgba(0, 113, 220, 0.06)',
@@ -48,8 +48,8 @@ export const VALUE_CARDS = [
 
 export const BUYER_STEPS = [
   { number: 1, title: 'Create Your Account', description: 'Register as a healthcare facility with your business details.' },
-  { number: 2, title: 'Browse Verified Catalog', description: 'Search 15,000+ medical products from NAFDAC-verified suppliers.' },
-  { number: 3, title: 'Compare & Order', description: 'View transparent pricing, compare suppliers, and place orders instantly.' },
+  { number: 2, title: 'Browse Our Catalog', description: 'Search 15,000+ NAFDAC-verified medical products across all categories.' },
+  { number: 3, title: 'Review & Order', description: 'View transparent pricing and place your order directly with Raphamel.' },
   { number: 4, title: 'Track Delivery', description: 'Monitor your shipment in real-time with delivery confirmations.' },
   { number: 5, title: 'Manage Invoices', description: 'Access order history, invoices, and automated compliance reports.' },
 ];
@@ -64,6 +64,6 @@ export const SUPPLIER_STEPS = [
 
 export const STATS = [
   { value: '15K+', label: 'Products', yellow: false },
-  { value: '800+', label: 'Suppliers', yellow: true },
+  { value: '800+', label: 'Facilities', yellow: true },
   { value: '1,200+', label: 'Waitlist', yellow: false },
 ];
