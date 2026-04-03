@@ -1,6 +1,10 @@
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {
+    // Explicitly set the root to the frontend directory so Turbopack does not
+    // walk up and confuse the monorepo-level package-lock.json as the root.
+    root: process.cwd(),
+  },
   images: {
     remotePatterns: [
       { protocol: 'http',  hostname: 'localhost' },

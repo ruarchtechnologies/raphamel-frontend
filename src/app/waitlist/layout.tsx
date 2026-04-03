@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Fraunces, DM_Sans, DM_Mono } from 'next/font/google';
-import { Toaster } from 'sonner';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -45,7 +44,6 @@ export default function WaitlistLayout({ children }: { children: React.ReactNode
   return (
     <div className={`${fraunces.variable} ${dmSans.variable} ${dmMono.variable}`}>
       {children}
-      <Toaster position="top-center" richColors />
     </div>
   );
 }

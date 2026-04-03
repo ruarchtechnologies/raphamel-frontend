@@ -2,9 +2,8 @@
 // Usage: const { submit, loading, error, success } = useWaitlistSubmit()
 
 import { useState } from "react";
-import { toast } from "sonner";
 
-const WAITLIST_URL = process.env.NEXT_PUBLIC_WAITLIST_URL!;
+const WAITLIST_URL = process.env.NEXT_PUBLIC_SHEETS_WEBHOOK_URL!;
 
 export type BuyerPayload = {
   type: "buyer";
@@ -24,33 +23,36 @@ export function useWaitlistSubmit() {
   const [success, setSuccess] = useState(false);
 
   async function submit(payload: BuyerPayload) {
+    console.log('[useWaitlistSubmit] submit called, WAITLIST_URL:', WAITLIST_URL);
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      // Google Apps Script doesn't support JSON Content-Type from browser (CORS)
-      // So we use no-cors mode — we won't get a response body, but it works.
-      // Minimum 1.5s delay so the loading state is visible to the user.
-      await Promise.all([
+      // text/plain avoids a CORS preflight — Google Apps Script handles simple requests fine.
+      // Minimum 1.5s so the loading spinner is always visible.
+      const [res] = await Promise.all([
         fetch(WAITLIST_URL, {
           method: "POST",
-          mode: "no-cors",
           headers: { "Content-Type": "text/plain" },
           body: JSON.stringify(payload),
         }),
         new Promise((resolve) => setTimeout(resolve, 1500)),
       ]);
 
+      if (!res.ok) {
+        throw new Error(`Server error (${res.status})`);
+      }
+
+      const body = await res.json();
+      if (body.status !== 200) {
+        throw new Error(body.message ?? "Submission failed. Please try again.");
+      }
+
       setSuccess(true);
-      toast.success("You're on the list!", {
-        description: "We'll be in touch as we approach launch.",
-        duration: 5000,
-      });
     } catch (err: any) {
       const message = err?.message ?? "Something went wrong. Please try again.";
       setError(message);
-      toast.error("Submission failed", { description: message, duration: 5000 });
     } finally {
       setLoading(false);
     }
