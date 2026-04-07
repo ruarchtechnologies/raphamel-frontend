@@ -39,6 +39,10 @@
 //   return null;
 // }
 
+export default function VendorStorePage() {
+  return null;
+}
+
 // /* ORIGINAL VENDOR STORE PAGE — disabled
 // function VendorStorePageOriginal({ params }: { params: { slug: string } }) {
 //   return (
