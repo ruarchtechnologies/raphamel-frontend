@@ -26,6 +26,8 @@
  *   and returns HTTP 404. The user sees your custom 404 page.
  */
 
+export const runtime = 'edge';
+
 import type { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -47,10 +49,6 @@ import { ChevronRight } from 'lucide-react';
 // from CDN — zero server cost per request.
 //
 // If you skip this, Next.js renders on-demand (like a normal server).
-
-export async function generateStaticParams() {
-  return HEALTH_CATEGORIES.map((cat) => ({ slug: cat.slug }));
-}
 
 // ── Dynamic metadata per category ────────────────────────────────────────────
 
