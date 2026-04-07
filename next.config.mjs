@@ -6,6 +6,7 @@ const nextConfig = {
     root: process.cwd(),
   },
   images: {
+    qualities: [75, 85],
     remotePatterns: [
       { protocol: 'http',  hostname: 'localhost' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },

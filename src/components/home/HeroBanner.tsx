@@ -64,7 +64,7 @@ const SLIDES = [
     subtitle:
       'Scalpels, forceps, retractors and complete surgical kits sourced from registered importers and distributors.',
     cta: { label: 'Shop Surgical', href: '/categories/surgical-equipment' },
-    secondaryCta: { label: 'Find a Supplier', href: '/vendors' },
+    secondaryCta: { label: 'View All Products', href: '/products' }, // DISABLED: was 'Find a Supplier' → '/vendors' — vendor/supplier feature removed
     bg: 'from-[#0f1f0a] to-[#1a3810]',
     accent: '#22c55e',
     image:

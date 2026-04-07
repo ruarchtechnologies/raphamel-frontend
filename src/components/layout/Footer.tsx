@@ -33,13 +33,14 @@ const LINKS = {
     { label: 'Returns & Claims', href: '/returns' },
     { label: 'Track Order', href: '/track' },
   ],
-  supplier: [
-    { label: 'Sell on Raphamel', href: '/vendor/register' },
-    { label: 'Supplier Dashboard', href: '/vendor/dashboard' },
-    { label: 'Supplier Policies', href: '/vendor-policies' },
-    { label: 'Business Verification', href: '/vendor/verification' },
-    { label: 'Help Centre', href: '/help' },
-  ],
+  // DISABLED: supplier/vendor feature removed
+  // supplier: [
+  //   { label: 'Sell on Raphamel', href: '/vendor/register' },
+  //   { label: 'Supplier Dashboard', href: '/vendor/dashboard' },
+  //   { label: 'Supplier Policies', href: '/vendor-policies' },
+  //   { label: 'Business Verification', href: '/vendor/verification' },
+  //   { label: 'Help Centre', href: '/help' },
+  // ],
   categories: [
     { label: 'Hospital Consumables', href: '/categories/hospital-consumables' },
     { label: 'Surgical Equipment', href: '/categories/surgical-equipment' },
@@ -53,7 +54,7 @@ const LINKS = {
 
 const FEATURES = [
   { icon: Truck, title: 'Nationwide Delivery', desc: 'Cold-chain logistics available' },
-  { icon: Shield, title: 'Verified Suppliers', desc: 'NAFDAC-registered vendors only' },
+  // { icon: Shield, title: 'Verified Suppliers', desc: 'NAFDAC-registered vendors only' }, // DISABLED: vendor/supplier feature removed
   { icon: RefreshCcw, title: 'Easy Returns', desc: '14-day return policy' },
   { icon: Headphones, title: '24/7 Support', desc: 'Dedicated procurement support' },
 ];
@@ -88,7 +89,7 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2 mb-4">
 
               <Image
-                src="/logo.png"
+                src="/images/logo.png"
                 alt="Raphamel"
                 width={50}
                 height={50}
@@ -102,8 +103,9 @@ export function Footer() {
               <span className="text-white font-bold text-xl">Raphamel</span>
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-5 max-w-xs">
-              Nigeria&apos;s B2B healthcare marketplace — connecting verified medical
-              suppliers with hospitals, clinics, pharmacies and healthcare institutions.
+              {/* DISABLED: was 'connecting verified medical suppliers with hospitals...' — vendor/supplier feature removed */}
+              Nigeria&apos;s B2B healthcare company — supplying NAFDAC-compliant medical
+              products directly to hospitals, clinics, pharmacies and healthcare institutions.
             </p>
 
             {/* Social icons */}
@@ -150,7 +152,7 @@ export function Footer() {
           {[
             { title: 'Company', links: LINKS.company },
             { title: 'Buyers', links: LINKS.buyer },
-            { title: 'Suppliers', links: LINKS.supplier },
+            // { title: 'Suppliers', links: LINKS.supplier }, // DISABLED: vendor/supplier feature removed
             { title: 'Categories', links: LINKS.categories },
           ].map(({ title, links }) => (
             <div key={title}>

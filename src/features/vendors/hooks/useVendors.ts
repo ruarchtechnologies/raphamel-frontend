@@ -1,12 +1,6 @@
-/**
- * FLUTTER EQUIV: VendorCubit / VendorNotifier
- *
- * React Query hooks for vendor data.
- *
- * USAGE:
- *   const { data: vendors, isLoading } = useFeaturedVendors();
- */
+// DISABLED: vendor/supplier feature removed — entire file commented out
 
+/*
 import { useQuery } from '@tanstack/react-query';
 import { fetchFeaturedVendors, fetchVendors, fetchVendorBySlug } from '@/data/api/vendors.api';
 import type { VendorFilters } from '@/types/index';
@@ -43,3 +37,4 @@ export function useVendorBySlug(slug: string) {
     staleTime: 1000 * 60 * 5,
   });
 }
+*/

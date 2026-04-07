@@ -7,13 +7,13 @@ Africa's B2B medical marketplace, built with [Next.js](https://nextjs.org).
 Install dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
 Run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -50,7 +50,7 @@ src/
 
 ## Tech Stack
 
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v3
 - **Animations:** Framer Motion

@@ -32,6 +32,7 @@ import { CartSidebar } from './CartSidebar';
 import { MobileMenu } from './MobileMenu';
 import { useUIStore } from '@/stores/ui.store';
 import { useCartStore } from '@/stores/cart.store';
+import { useAuthStore } from '@/stores/auth.store';
 import { cn } from '@/lib/utils';
 
 // ── Navigation configuration ─────────────────────────────────────────────────
@@ -59,7 +60,7 @@ const NAV_LINKS = [
       { label: 'Imaging & Monitoring', href: '/categories/imaging-monitoring-equipment' },
     ],
   },
-  { label: 'Suppliers', href: '/vendors' },
+  // { label: 'Suppliers', href: '/vendors' }, // DISABLED: vendor/supplier feature removed
   { label: 'Deals', href: '/products?sort=sale' },
 ] as const;
 
@@ -135,7 +136,8 @@ export function Header() {
    * when the itemCount value changes" — NOT when other cart fields change.
    * This is like Riverpod's select() or BLoC's buildWhen.
    */
-  const itemCount = useCartStore((s) => s.itemCount());
+  const itemCount  = useCartStore((s) => s.itemCount());
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
 
   /*
    * FLUTTER EQUIV: initState() + addPostFrameCallback + ScrollController
@@ -180,7 +182,7 @@ export function Header() {
                * Content: Raphamel logo — medical cross or caduceus + wordmark
                */}
               <Image
-                src="/logo.png"
+                src="/images/logo.png"
                 alt="Raphamel"
                 width={50}
                 height={50}
@@ -267,24 +269,40 @@ export function Header() {
 
             {/* Right actions */}
             <div className="ml-auto flex items-center gap-4 text-sm">
+              {/* DISABLED: vendor/supplier portal removed
               <Link
                 href="/vendor/dashboard"
                 className="text-gray-600 hover:text-primary font-medium transition-colors hidden xl:block"
               >
                 Supplier Portal
               </Link>
-              <Link
-                href="/login"
-                className="text-gray-600 hover:text-primary font-medium transition-colors"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/register"
-                className="inline-flex items-center h-9 px-4 bg-gray-900 text-white text-sm font-semibold rounded-[6px] hover:bg-gray-700 transition-colors"
-              >
-                Register
-              </Link>
+              */}
+              {isLoggedIn ? (
+                <Link
+                  href="/account"
+                  className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <User size={15} style={{ color: 'var(--color-primary)' }} />
+                  </div>
+                  My Account
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-gray-600 hover:text-primary font-medium transition-colors"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center h-9 px-4 bg-gray-900 text-white text-sm font-semibold rounded-[6px] hover:bg-gray-700 transition-colors"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

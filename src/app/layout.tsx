@@ -60,19 +60,19 @@ const outfit = Outfit({
  */
 export const metadata: Metadata = {
   title: {
-    default: 'Raphamel — Nigeria\'s B2B Medical Marketplace',
+    default: 'Raphamel — Nigeria\'s B2B Medical Supply Company',
     template: '%s | Raphamel',
   },
   description:
-    'Nigeria\'s B2B healthcare marketplace connecting verified medical suppliers with hospitals, clinics and pharmacies. Source hospital consumables, surgical equipment, diagnostic devices and more.',
+    'Nigeria\'s B2B healthcare company supplying NAFDAC-compliant medical products directly to hospitals, clinics and pharmacies. Hospital consumables, surgical equipment, diagnostic devices and more.',
   keywords: [
     'medical supplies Nigeria',
-    'B2B healthcare marketplace',
+    'B2B healthcare',
     'hospital consumables',
     'surgical equipment',
-    'NAFDAC certified suppliers',
+    'NAFDAC certified medical products',
     'diagnostic devices Nigeria',
-    'medical equipment suppliers',
+    'medical equipment Nigeria',
     'raphamel',
   ],
   openGraph: {
@@ -112,7 +112,7 @@ export default function RootLayout({
    */
   return (
     <html lang="en" className={outfit.variable}>
-      <body className={outfit.className}>
+      <body className={outfit.className} suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

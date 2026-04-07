@@ -85,9 +85,11 @@ export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCard
             />
           </div>
           <div className="flex-1 min-w-0 flex flex-col">
-            {product.vendorName && (
+            {/* DISABLED: vendor/supplier feature removed
+          {product.vendorName && (
               <span className="text-xs text-gray-400 mb-0.5">{product.vendorName}</span>
             )}
+          */}
             <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
               {product.name}
             </h3>
@@ -176,9 +178,11 @@ export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCard
 
         {/* Info */}
         <div className="p-3">
+          {/* DISABLED: vendor/supplier feature removed
           {product.vendorName && (
             <p className="text-xs text-gray-400 mb-0.5 truncate">{product.vendorName}</p>
           )}
+          */}
           <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
             {product.name}
           </h3>

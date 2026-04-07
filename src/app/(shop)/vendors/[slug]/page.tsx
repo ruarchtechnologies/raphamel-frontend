@@ -34,7 +34,13 @@ const PRODUCTS: ProductCardData[] = [
   { id: '8', slug: 'gaming-keyboard', name: 'RGB Mechanical Gaming Keyboard', price: 32000, compareAtPrice: 42000, image: 'https://images.unsplash.com/photo-1601445638532-3c6f6c3aa1d6?w=400&h=500&fit=crop', rating: 4.7, reviewCount: 284 },
 ];
 
+// DISABLED: vendor/supplier feature removed — page returns null
 export default function VendorStorePage({ params }: { params: { slug: string } }) {
+  return null;
+}
+
+/* ORIGINAL VENDOR STORE PAGE — disabled
+function VendorStorePageOriginal({ params }: { params: { slug: string } }) {
   return (
     <div className="page-enter">
       {/* Banner */}
@@ -114,3 +120,4 @@ export default function VendorStorePage({ params }: { params: { slug: string } }
     </div>
   );
 }
+*/

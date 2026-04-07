@@ -154,7 +154,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
           >
-            {/* Vendor */}
+            {/* DISABLED: vendor/supplier feature removed
             <Link
               href={`/vendors/${PRODUCT.vendor.slug}`}
               className="inline-flex items-center gap-1 text-xs text-primary font-semibold mb-2 hover:underline"
@@ -162,6 +162,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
               {PRODUCT.vendor.name}
               {PRODUCT.vendor.verified && <BadgeCheck size={13} />}
             </Link>
+            */}
 
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight mb-3">
               {PRODUCT.name}

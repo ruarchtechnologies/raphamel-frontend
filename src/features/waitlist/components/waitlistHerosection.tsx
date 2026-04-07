@@ -33,7 +33,8 @@ export function WaitlistHeroSection() {
           </h1>
 
           <p className="subheadline">
-            Connect verified suppliers with healthcare facilities. Transparent pricing, reliable delivery, NAFDAC compliance built-in.
+            {/* DISABLED: was 'Connect verified suppliers with healthcare facilities' — vendor/supplier feature removed */}
+            NAFDAC-compliant medical supplies delivered directly to hospitals, clinics, and pharmacies. Transparent pricing, reliable delivery, built-in compliance.
           </p>
 
           <button

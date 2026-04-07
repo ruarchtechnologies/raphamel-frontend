@@ -150,6 +150,24 @@
   .aspect-category { aspect-ratio: 1; }
 }
 
+/* ── Shimmer skeleton ────────────────────────────────────────────────────── */
+/*
+ * Used by <OptimizedImage /> as the loading placeholder.
+ * The gradient and dark-mode overrides are defined here (not inline) so
+ * @media (prefers-color-scheme: dark) can cleanly swap the colours.
+ */
+.shimmer-gradient {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .shimmer-gradient {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 200% 100%;
+  }
+}
+
 /* ── Animations ──────────────────────────────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; }

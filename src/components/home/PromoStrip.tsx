@@ -29,8 +29,8 @@ const BANNERS = [
   },
   {
     title: 'NAFDAC Certified',
-    subtitle: 'All suppliers verified & approved',
-    badge: 'Trusted Suppliers',
+    subtitle: 'All products NAFDAC-compliant & verified', // DISABLED: was 'All suppliers verified & approved' — vendor/supplier feature removed
+    badge: 'NAFDAC Compliant', // DISABLED: was 'Trusted Suppliers' — vendor/supplier feature removed
     href: '/categories/hospital-consumables',
     bg: 'from-[#0f1f0a] to-[#1a3810]',
     // IMAGE NEEDED: promo-nafdac-certified.jpg | Size: 400x250

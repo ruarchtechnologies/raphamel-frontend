@@ -8,17 +8,18 @@
 export enum UserRole {
   SUPER_ADMIN  = 'super_admin',
   ADMIN        = 'admin',
-  VENDOR       = 'vendor',
-  VENDOR_STAFF = 'vendor_staff',
+  // VENDOR       = 'vendor',       // DISABLED: vendor/supplier feature removed
+  // VENDOR_STAFF = 'vendor_staff', // DISABLED: vendor/supplier feature removed
   CUSTOMER     = 'customer',
 }
 
-export enum VendorStatus {
-  PENDING  = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  SUSPENDED = 'suspended',
-}
+// DISABLED: vendor/supplier feature removed
+// export enum VendorStatus {
+//   PENDING  = 'pending',
+//   APPROVED = 'approved',
+//   REJECTED = 'rejected',
+//   SUSPENDED = 'suspended',
+// }
 
 export enum OrderStatus {
   PENDING    = 'pending',
@@ -35,11 +36,12 @@ export enum PaymentStatus {
   FAILED  = 'failed',
 }
 
-export enum PayoutStatus {
-  PENDING   = 'pending',
-  PROCESSED = 'processed',
-  FAILED    = 'failed',
-}
+// DISABLED: vendor/supplier feature removed
+// export enum PayoutStatus {
+//   PENDING   = 'pending',
+//   PROCESSED = 'processed',
+//   FAILED    = 'failed',
+// }
 
 export enum DiscountType {
   PERCENTAGE = 'percentage',
@@ -58,30 +60,32 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   isEmailVerified: boolean;
-  isBusinessVerified: boolean;
-  cacCertificateUrl?: string;
-  operatingLicenseUrl?: string;
-  businessVerificationRejectionReason?: string;
-  vendor?: Vendor;
+  // DISABLED: vendor/supplier feature removed
+  // isBusinessVerified: boolean;
+  // cacCertificateUrl?: string;
+  // operatingLicenseUrl?: string;
+  // businessVerificationRejectionReason?: string;
+  // vendor?: Vendor;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Vendor {
-  id: string;
-  storeName: string;
-  slug: string;
-  description?: string;
-  logo?: string;
-  banner?: string;
-  status: VendorStatus;
-  commissionRate: number;
-  balance: number;
-  owner: User;
-  products?: Product[];
-  createdAt: string;
-  updatedAt: string;
-}
+// DISABLED: vendor/supplier feature removed
+// export interface Vendor {
+//   id: string;
+//   storeName: string;
+//   slug: string;
+//   description?: string;
+//   logo?: string;
+//   banner?: string;
+//   status: VendorStatus;
+//   commissionRate: number;
+//   balance: number;
+//   owner: User;
+//   products?: Product[];
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 export interface Category {
   id: string;
@@ -120,7 +124,7 @@ export interface Product {
   images: string[];
   isActive: boolean;
   isFeatured: boolean;
-  vendor: Vendor;
+  // vendor: Vendor; // DISABLED: vendor/supplier feature removed
   category?: Category;
   variants?: ProductVariant[];
   reviews?: Review[];
@@ -192,7 +196,7 @@ export interface OrderItem {
   variant?: ProductVariant;
   quantity: number;
   price: number;
-  vendorId: string;
+  // vendorId: string; // DISABLED: vendor/supplier feature removed
 }
 
 export interface Review {
@@ -201,7 +205,7 @@ export interface Review {
   user: User;
   productId: string;
   product?: Product;
-  vendorId?: string;
+  // vendorId?: string; // DISABLED: vendor/supplier feature removed
   rating: number;         /* 1–5 */
   title?: string;
   body: string;
@@ -231,7 +235,7 @@ export interface Coupon {
   usageCount: number;
   expiresAt?: string;
   isActive: boolean;
-  vendorId?: string;
+  // vendorId?: string; // DISABLED: vendor/supplier feature removed
 }
 
 export interface Banner {
@@ -334,7 +338,7 @@ export interface ImageItem {
 
 export interface ProductFilters {
   categoryId?: string;
-  vendorId?: string;
+  // vendorId?: string; // DISABLED: vendor/supplier feature removed
   minPrice?: number;
   maxPrice?: number;
   minRating?: number;
@@ -345,18 +349,19 @@ export interface ProductFilters {
   limit?: number;
 }
 
-export interface VendorFilters {
-  search?: string;
-  status?: VendorStatus;
-  page?: number;
-  limit?: number;
-}
+// DISABLED: vendor/supplier feature removed
+// export interface VendorFilters {
+//   search?: string;
+//   status?: VendorStatus;
+//   page?: number;
+//   limit?: number;
+// }
 
 // ── Dashboard stats ───────────────────────────────────────────────────────────
 
 export interface AdminDashboardStats {
   totalUsers: number;
-  totalVendors: number;
+  // totalVendors: number; // DISABLED: vendor/supplier feature removed
   totalProducts: number;
   totalOrders: number;
   totalRevenue: number;
@@ -370,10 +375,11 @@ export interface SalesAnalytics {
   }>;
 }
 
-export interface VendorDashboardStats {
-  totalProducts: number;
-  totalOrders: number;
-  totalRevenue: number;
-  balance: number;
-  pendingPayouts: number;
-}
+// DISABLED: vendor/supplier feature removed
+// export interface VendorDashboardStats {
+//   totalProducts: number;
+//   totalOrders: number;
+//   totalRevenue: number;
+//   balance: number;
+//   pendingPayouts: number;
+// }

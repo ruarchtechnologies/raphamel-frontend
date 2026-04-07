@@ -46,143 +46,110 @@ export const HEALTH_CATEGORIES: readonly CategoryEntity[] = [
     id: 'cat-01',
     name: 'Hospital Consumables',
     slug: 'hospital-consumables',
-    color: '#dbeafe', // Tailwind blue-100
+    color: '#dbeafe',
     description:
       'IV sets, syringes, catheters, nasogastric tubes, bandages and everyday single-use clinical consumables.',
-    // IMAGE NEEDED: hospital-consumables.jpg | Size: 800x500
-    // Content: Clean flatlay of IV bags, syringes, disposable gloves, gauze
-    image:
-      'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=500&fit=crop',
+    image: '/images/category-hospital-consumables.png',
     productCount: 3240,
   },
   {
     id: 'cat-02',
     name: 'Surgical Equipment',
     slug: 'surgical-equipment',
-    color: '#fee2e2', // Tailwind red-100
+    color: '#fee2e2',
     description:
       'Scalpels, forceps, retractors, needle holders and complete surgical instrument sets — NAFDAC certified.',
-    // IMAGE NEEDED: surgical-equipment.jpg | Size: 800x500
-    // Content: Stainless steel surgical instruments laid on blue sterile drape
-    image:
-      'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=800&h=500&fit=crop',
+    image: '/images/category-surgical-equipment.png',
     productCount: 1180,
   },
   {
     id: 'cat-03',
     name: 'Diagnostic Devices',
     slug: 'diagnostic-devices',
-    color: '#ede9fe', // Tailwind violet-100
+    color: '#ede9fe',
     description:
       'Stethoscopes, otoscopes, sphygmomanometers, glucometers and point-of-care testing kits.',
-    // IMAGE NEEDED: diagnostic-devices.jpg | Size: 800x500
-    // Content: Doctor holding stethoscope, glucometer and otoscope on white bg
-    image:
-      'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=500&fit=crop',
+    image: '/images/category-diagnostic-devices.png',
     productCount: 2670,
   },
   {
     id: 'cat-04',
     name: 'Personal Protective Equipment',
     slug: 'personal-protective-equipment',
-    color: '#fef9c3', // Tailwind yellow-100
+    color: '#fef9c3',
     description:
       'N95/FFP2 masks, nitrile gloves, isolation gowns, face shields and complete PPE bundles.',
-    // IMAGE NEEDED: personal-protective-equipment.jpg | Size: 800x500
-    // Content: Healthcare worker in full PPE — gown, N95, face shield, gloves
-    image:
-      'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=800&h=500&fit=crop',
+    image: '/images/category-personal-protective-equipment.png',
     productCount: 1950,
   },
   {
     id: 'cat-05',
     name: 'Rehabilitation Equipment',
     slug: 'rehabilitation-equipment',
-    color: '#d1fae5', // Tailwind emerald-100
+    color: '#d1fae5',
     description:
       'Physiotherapy tools, TENS units, parallel bars, balance boards and post-surgery recovery equipment.',
-    // IMAGE NEEDED: rehabilitation-equipment.jpg | Size: 800x500
-    // Content: Physiotherapist assisting patient with parallel bars / resistance bands
-    image:
-      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=500&fit=crop',
+    image: '/images/category-rehabilitation-equipment.png',
     productCount: 870,
   },
   {
     id: 'cat-06',
     name: 'Laboratory Supplies',
     slug: 'laboratory-supplies',
-    color: '#e0e7ff', // Tailwind indigo-100
+    color: '#e0e7ff',
     description:
       'Test tubes, pipettes, centrifuges, microscopes, reagents and rapid diagnostic test kits.',
-    // IMAGE NEEDED: laboratory-supplies.jpg | Size: 800x500
-    // Content: Lab technician with test tubes and microscope on clean bench
-    image:
-      'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&h=500&fit=crop',
+    image: '/images/category-laboratory-supplies.png',
     productCount: 2140,
   },
   {
     id: 'cat-07',
     name: 'Patient Care Products',
     slug: 'patient-care-products',
-    color: '#fce7f3', // Tailwind pink-100
+    color: '#fce7f3',
     description:
       'Hospital beds, bedpans, wound care kits, nursing supplies and patient hygiene products.',
-    // IMAGE NEEDED: patient-care-products.jpg | Size: 800x500
-    // Content: Clean hospital room with adjustable bed, patient monitor, IV stand
-    image:
-      'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=800&h=500&fit=crop',
+    image: '/images/category-patient-care-products.png',
     productCount: 1560,
   },
   {
     id: 'cat-08',
     name: 'Pharmaceuticals',
     slug: 'pharmaceuticals',
-    color: '#ffedd5', // Tailwind orange-100
+    color: '#ffedd5',
     description:
       'Prescription drugs, OTC medications, antibiotics, vaccines, IV fluids and essential medicines for clinical and hospital use.',
-    // IMAGE NEEDED: pharmaceuticals.jpg | Size: 800x500
-    // Content: Assorted pharmaceutical products — blister packs, vials, IV bags on clean background
-    image:
-      'https://images.unsplash.com/photo-1576671081837-49000212a370?w=800&h=500&fit=crop',
+    image: '/images/category-pharmaceuticals.png',
     productCount: 730,
   },
   {
     id: 'cat-09',
     name: 'Mobility & Orthopaedic Aids',
     slug: 'mobility-orthopaedic-aids',
-    color: '#ccfbf1', // Tailwind teal-100
+    color: '#ccfbf1',
     description:
       'Wheelchairs, crutches, walkers, orthotic braces, compression stockings and mobility aids.',
-    // IMAGE NEEDED: mobility-orthopaedic-aids.jpg | Size: 800x500
-    // Content: Lightweight wheelchair, forearm crutches and ankle brace on white background
-    image:
-      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=500&fit=crop',
+    image: '/images/category-mobility-orthopaedic-aids.png',
     productCount: 940,
   },
   {
     id: 'cat-10',
     name: 'Topicals',
     slug: 'topicals',
-    color: '#dcfce7', // Tailwind green-100
+    color: '#dcfce7',
     description:
       'Antiseptic creams, wound ointments, medicated lotions, dermatological preparations and topical anaesthetics.',
-    // IMAGE NEEDED: topicals.jpg | Size: 800x500
-    // Content: Assorted topical creams, ointments and lotions on a clean background
-    image:
-      'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&h=500&fit=crop',
+    image: '/images/category-topicals.png',
     productCount: 890,
   },
   {
     id: 'cat-11',
     name: 'Imaging & Monitoring Equipment',
     slug: 'imaging-monitoring-equipment',
-    color: '#f1f5f9', // Tailwind slate-100
+    color: '#f1f5f9',
     description:
       'Ultrasound machines, patient monitors, ECG devices, pulse oximeters and portable X-ray units.',
-    // IMAGE NEEDED: imaging-monitoring-equipment.jpg | Size: 800x500
-    // Content: Patient vital signs monitor displaying ECG waveform, alongside ultrasound probe
-    image:
-      'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&h=500&fit=crop',
+    image: '/images/category-imaging-monitoring-equipment.png',
     productCount: 1120,
   },
 ] as const;

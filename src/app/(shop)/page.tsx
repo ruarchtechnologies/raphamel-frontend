@@ -24,14 +24,14 @@
 import { HeroBanner } from '@/components/home/HeroBanner';
 import { CategorySection } from '@/components/home/CategorySection';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
-import { VendorSection } from '@/components/home/VendorSection';
+// import { VendorSection } from '@/components/home/VendorSection'; // DISABLED: vendor/supplier feature removed
 import { PromoStrip } from '@/components/home/PromoStrip';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Raphamel — Nigeria\'s B2B Medical Marketplace',
+  title: 'Raphamel — Nigeria\'s B2B Medical Supply Company',
   description:
-    'Source hospital consumables, surgical equipment, diagnostic devices and PPE from NAFDAC-verified suppliers. Nigeria\'s leading B2B healthcare marketplace.',
+    'Hospital consumables, surgical equipment, diagnostic devices and PPE — NAFDAC-compliant medical products delivered directly to healthcare facilities across Nigeria.',
 };
 
 export default function HomePage() {
@@ -59,7 +59,7 @@ export default function HomePage() {
       <CategorySection />
       <PromoStrip />
       <FeaturedProducts />
-      <VendorSection />
+      {/* <VendorSection /> DISABLED: vendor/supplier feature removed */}
     </div>
   );
 }

@@ -67,7 +67,7 @@ export function SearchBar({ className, onClose }: SearchBarProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setFocused(true)}
-          placeholder="Search products, brands, vendors…"
+          placeholder="Search products, brands, categories…"
           className={cn(
             'input-base pl-10 pr-10 h-11 rounded-full bg-gray-50 border-gray-200',
             'focus:bg-white focus:border-primary',

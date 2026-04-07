@@ -55,6 +55,12 @@ Thumbs.db
 # Claude / AI tools
 .claude/
 
+# Project docs (local only)
+CLAUDE.md
+ROADMAP.md
+SPRINT.md
+tickets/
+
 # Temporary
 tmp/
 .tmp/

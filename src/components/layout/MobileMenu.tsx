@@ -5,6 +5,7 @@ import { ChevronDown, User, ShoppingBag, Heart, Store, LayoutGrid, Tag, Info, Ph
 import { useState } from 'react';
 import { Drawer } from './Drawer';
 import { useUIStore } from '@/stores/ui.store';
+import { useAuthStore } from '@/stores/auth.store';
 import { cn } from '@/lib/utils';
 
 const NAV = [
@@ -20,7 +21,7 @@ const NAV = [
       { label: 'Sports', href: '/categories/sports' },
     ],
   },
-  { label: 'Vendors', href: '/vendors' },
+  // { label: 'Vendors', href: '/vendors' }, // DISABLED: vendor/supplier feature removed
   { label: 'Deals', href: '/products?sort=sale' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
@@ -28,6 +29,7 @@ const NAV = [
 
 export function MobileMenu() {
   const { menuOpen, setMenuOpen } = useUIStore();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
@@ -84,20 +86,32 @@ export function MobileMenu() {
         </ul>
 
         <div className="border-t border-gray-100 mt-4 pt-4 space-y-0.5">
-          <Link
-            href="/login"
-            className="flex items-center gap-2.5 py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-[6px] transition-colors"
-            onClick={() => setMenuOpen(false)}
-          >
-            <User size={16} /> Sign In
-          </Link>
-          <Link
-            href="/register"
-            className="flex items-center gap-2.5 py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-[6px] transition-colors"
-            onClick={() => setMenuOpen(false)}
-          >
-            <Store size={16} /> Become a Vendor
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/account"
+              className="flex items-center gap-2.5 py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-[6px] transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              <User size={16} /> My Account
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="flex items-center gap-2.5 py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-[6px] transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                <User size={16} /> Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="flex items-center gap-2.5 py-2.5 px-2 text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-[6px] transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                <User size={16} /> Register
+              </Link>
+            </>
+          )}
         </div>
       </nav>
     </Drawer>

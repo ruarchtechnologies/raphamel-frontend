@@ -105,6 +105,17 @@ const config: Config = {
         drawer:  '4px 0 24px rgba(0, 0, 0, 0.12)',
       },
 
+      // ── Shimmer / skeleton animation ─────────────────────────────────────
+      keyframes: {
+        shimmer: {
+          from: { backgroundPosition: '200% 0' },
+          to:   { backgroundPosition: '-200% 0' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 1.4s ease-in-out infinite',
+      },
+
       // ── Transition timing ────────────────────────────────────────────────
       transitionTimingFunction: {
         button: 'cubic-bezier(0.25, 0.1, 0.25, 1)',

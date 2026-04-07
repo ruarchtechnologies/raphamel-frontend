@@ -690,6 +690,21 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@medusajs/js-sdk@^2.13.5":
+  version "2.13.5"
+  resolved "https://registry.yarnpkg.com/@medusajs/js-sdk/-/js-sdk-2.13.5.tgz#e2d813373bd6b305ee4afbbf105e1f4b8b56d8d4"
+  integrity sha512-7cQqZWyl1vIVl7NpAwiqonXLktnLTixhmsgkAEIGxq7ZbITFYCbrx6S7Nih2ldAMb6VpseTvIeoDkXVxBpcTvw==
+  dependencies:
+    fetch-event-stream "^0.1.5"
+    qs "^6.12.1"
+
+"@medusajs/types@^2.13.5":
+  version "2.13.5"
+  resolved "https://registry.yarnpkg.com/@medusajs/types/-/types-2.13.5.tgz#25fb1f63a2a190b6f260b4252e8949c3f2dbbaef"
+  integrity sha512-vHfXGdR2GcQB7tLnX13Tzo0vlzSIPvMxea8y60cEviZhq8+ercXCkMylNzhCeXngEU7pLv8aWHBQqZ7YOT547Q==
+  dependencies:
+    bignumber.js "^9.1.2"
+
 "@napi-rs/wasm-runtime@^0.2.11":
   version "0.2.12"
   resolved "https://registry.yarnpkg.com/@napi-rs/wasm-runtime/-/wasm-runtime-0.2.12.tgz#3e78a8b96e6c33a6c517e1894efbd5385a7cb6f2"
@@ -1411,6 +1426,11 @@ baseline-browser-mapping@^2.10.12, baseline-browser-mapping@^2.9.19:
   version "2.10.13"
   resolved "https://registry.yarnpkg.com/baseline-browser-mapping/-/baseline-browser-mapping-2.10.13.tgz#5a154cc4589193015a274e3d18319b0d76b9224e"
   integrity sha512-BL2sTuHOdy0YT1lYieUxTw/QMtPBC3pmlJC6xk8BBYVv6vcw3SGdKemQ+Xsx9ik2F/lYDO9tqsFQH1r9PFuHKw==
+
+bignumber.js@^9.1.2:
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.3.1.tgz#759c5aaddf2ffdc4f154f7b493e1c8770f88c4d7"
+  integrity sha512-Ko0uX15oIUS7wJ3Rb30Fs6SkVbLmPBAKdlm7q9+ak9bbIeFf0MwuBsQV6z7+X768/cHsfg+WlysDWJcmthjsjQ==
 
 binary-extensions@^2.0.0:
   version "2.3.0"
@@ -2338,6 +2358,11 @@ fdir@^6.5.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/fdir/-/fdir-6.5.0.tgz#ed2ab967a331ade62f18d077dae192684d50d350"
   integrity sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==
+
+fetch-event-stream@^0.1.5:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/fetch-event-stream/-/fetch-event-stream-0.1.6.tgz#5013b504cfb96ea47532710b9bc555b6e991a4f3"
+  integrity sha512-GREtJ5HNikdU2AXtZ6E/5bk+aslMU6ie5mPG6H9nvsdDkkHQ6m5lHwmmmDTOBexok9hApQ7EprsXCdmz9ZC68w==
 
 file-entry-cache@^6.0.1:
   version "6.0.1"
@@ -3467,6 +3492,13 @@ punycode@^2.1.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.3.1.tgz#027422e2faec0b25e1549c3e1bd8309b9133b6e5"
   integrity sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==
+
+qs@^6.12.1:
+  version "6.15.0"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.15.0.tgz#db8fd5d1b1d2d6b5b33adaf87429805f1909e7b3"
+  integrity sha512-mAZTtNCeetKMH+pSjrb76NAM8V9a05I9aBZOHztWy/UqcJdQYNsf59vrRKWnojAT9Y+GbIvoTBC++CPHqpDBhQ==
+  dependencies:
+    side-channel "^1.1.0"
 
 queue-microtask@^1.2.2:
   version "1.2.3"

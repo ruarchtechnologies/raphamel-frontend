@@ -207,7 +207,7 @@ export default function ProductsPage() {
           <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Products' }]} />
           <h1 className="text-2xl font-bold text-gray-900 mt-2">All Medical Products</h1>
           <p className="text-gray-500 text-sm mt-1">
-            {PRODUCTS.length}+ products from NAFDAC-verified suppliers
+            {PRODUCTS.length}+ NAFDAC-verified medical products {/* DISABLED: was 'from NAFDAC-verified suppliers' — vendor/supplier feature removed */}
           </p>
         </div>
       </div>

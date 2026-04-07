@@ -20,9 +20,9 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { HEALTH_CATEGORIES } from '@/domain/entities/category.entity';
 
 // ── Animation variants ────────────────────────────────────────────────────────
@@ -90,20 +90,15 @@ export function CategorySection() {
                 className="flex flex-col items-center gap-2.5 p-3 rounded-[10px] hover:shadow-lg transition-all group"
                 style={{ backgroundColor: cat.color }}
               >
-                {/* Category icon image — FLUTTER EQUIV: ClipOval(child: CachedNetworkImage) */}
+                {/* Category icon — fixed 56×56, clipped to circle by the parent */}
                 <div className="w-14 h-14 rounded-full overflow-hidden bg-white shadow-sm group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
-                  {/*
-                   * IMAGE NEEDED: See category.entity.ts for image specs per category.
-                   * Recommended: 112x112 PNG icon (2x for retina) with transparent bg.
-                   * Filename convention: icon-{slug}.png
-                   * e.g. icon-hospital-consumables.png
-                   */}
-                  <Image
-                    src={cat.image ?? '/images/categories/placeholder.jpg'}
+                  <OptimizedImage
+                    src={cat.image ?? '/images/category-hospital-consumables.png'}
                     alt={cat.name}
                     width={56}
                     height={56}
-                    className="w-full h-full object-cover"
+                    sizes="56px"
+                    className="object-cover object-top"
                   />
                 </div>
 
