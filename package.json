@@ -5,18 +5,23 @@
   "scripts": {
     "dev": "next dev",
     "dev:staging": "dotenv -e .env.staging -- next dev",
+
     "build": "next build",
     "build:staging": "dotenv -e .env.staging -- next build",
     "build:prod": "dotenv -e .env.production -- next build",
-    "build:cf": "dotenv -e .env.production -- npx @cloudflare/next-on-pages",
-    "build:cf:staging": "dotenv -e .env.staging -- npx @cloudflare/next-on-pages",
-    "build:cf:local": "npx @cloudflare/next-on-pages",
-    "preview": "npx wrangler pages dev .vercel/output/static",
-    "preview:staging": "dotenv -e .env.staging -- npx wrangler pages dev .vercel/output/static",
+
+    "build:cf": "dotenv -e .env.production -- yarn next-on-pages",
+    "build:cf:staging": "dotenv -e .env.staging -- yarn next-on-pages",
+    "build:cf:local": "yarn next-on-pages",
+
+    "preview": "yarn wrangler pages dev .vercel/output/static",
+    "preview:staging": "dotenv -e .env.staging -- yarn wrangler pages dev .vercel/output/static",
+
     "start": "next start",
     "start:staging": "dotenv -e .env.staging -- next start",
+
     "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "yarn tsc --noEmit",
     "postinstall": "node scripts/patch-next-lockfile.mjs"
   },
   "dependencies": {

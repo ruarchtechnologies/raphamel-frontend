@@ -52,14 +52,18 @@ Thumbs.db
 .idea/
 *.sw?
 
-# Claude / AI tools
+# Claude / AI tools — all local-only, never committed
 .claude/
+CLAUDE.md
+CLAUDE.local.md
+*.claude.md
+claude.json
 
 # Project docs (local only)
-CLAUDE.md
 ROADMAP.md
 SPRINT.md
 tickets/
+memory/
 
 # Temporary
 tmp/
