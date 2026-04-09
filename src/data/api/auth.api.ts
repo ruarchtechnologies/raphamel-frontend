@@ -1,12 +1,5 @@
-/**
- * FLUTTER EQUIV: lib/data/datasources/auth_remote_datasource.dart
- *
- * Auth API functions. The JWT access token is managed by src/lib/api.ts
- * interceptors — these functions just call the right endpoints.
- */
-
-import api, { setAccessToken } from '@/lib/api';
-import type { AuthResponse, MessageResponse } from '@/types/index';
+import { sdk } from '@/lib/medusa';
+import type { HttpTypes } from '@medusajs/types';
 
 export interface LoginPayload {
   email: string;
@@ -19,38 +12,84 @@ export interface RegisterPayload {
   email: string;
   password: string;
   phone?: string;
-  /** 'customer' | 'vendor' */
-  role?: string;
+  facilityType?: string;
+  cacDocUrl?: string;
+  licenceDocUrl?: string;
 }
 
-/** Sign in — returns tokens + user. Backend sets httpOnly refresh cookie. */
-export async function login(payload: LoginPayload): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>('/auth/login', payload);
-  setAccessToken(data.accessToken);
-  return data;
+export interface AuthUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
 }
 
-/** Register a new account. */
-export async function register(payload: RegisterPayload): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>('/auth/register', payload);
-  setAccessToken(data.accessToken);
-  return data;
+export interface AuthResult {
+  user: AuthUser;
 }
 
-/** Sign out — clears server-side refresh cookie. */
+function toAuthUser(customer: HttpTypes.StoreCustomer): AuthUser {
+  return {
+    id: customer.id,
+    email: customer.email ?? '',
+    firstName: customer.first_name ?? '',
+    lastName: customer.last_name ?? '',
+    phone: customer.phone ?? undefined,
+  };
+}
+
+/** Sign in — SDK manages the token internally after a successful login. */
+export async function login(payload: LoginPayload): Promise<AuthResult> {
+  await sdk.auth.login('customer', 'emailpass', {
+    email: payload.email,
+    password: payload.password,
+  });
+  const { customer } = await sdk.store.customer.retrieve();
+  return { user: toAuthUser(customer) };
+}
+
+/**
+ * Register a new customer account.
+ * Medusa creates the auth identity + customer record in one call.
+ * We then update the profile with name and phone.
+ */
+export async function register(payload: RegisterPayload): Promise<AuthResult> {
+  await sdk.auth.register('customer', 'emailpass', {
+    email: payload.email,
+    password: payload.password,
+  });
+
+  const { customer } = await sdk.store.customer.update({
+    first_name: payload.firstName,
+    last_name: payload.lastName,
+    phone: payload.phone,
+    metadata: {
+      facility_type: payload.facilityType ?? null,
+      cac_doc_url: payload.cacDocUrl ?? null,
+      licence_doc_url: payload.licenceDocUrl ?? null,
+      verification_status: 'pending',
+    },
+  });
+
+  return { user: toAuthUser(customer) };
+}
+
+/** Sign out — clears the SDK's stored token. */
 export async function logout(): Promise<void> {
-  await api.post('/auth/logout');
-  setAccessToken(null);
+  await sdk.auth.logout();
 }
 
-/** Request password reset email. */
-export async function forgotPassword(email: string): Promise<MessageResponse> {
-  const { data } = await api.post<MessageResponse>('/auth/forgot-password', { email });
-  return data;
-}
-
-/** Get currently authenticated user profile. */
-export async function fetchMe() {
-  const { data } = await api.get('/auth/me');
-  return data;
+/**
+ * Get the currently authenticated customer.
+ * Returns null when the user is not logged in (401) instead of throwing,
+ * so useMe() can treat it as "unauthenticated" rather than an error.
+ */
+export async function fetchMe(): Promise<AuthUser | null> {
+  try {
+    const { customer } = await sdk.store.customer.retrieve();
+    return toAuthUser(customer);
+  } catch {
+    return null;
+  }
 }

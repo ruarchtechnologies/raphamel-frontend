@@ -26,7 +26,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { login, register, logout, fetchMe } from '@/data/api/auth.api';
-import type { LoginPayload, RegisterPayload } from '@/data/api/auth.api';
+import type { LoginPayload, RegisterPayload, AuthUser } from '@/data/api/auth.api';
 import { toast } from 'sonner';
 
 export const authKeys = {

@@ -17,6 +17,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { AuthLeftPanel } from '@/components/auth/AuthLeftPanel';
 import { cn } from '@/lib/utils';
+import { useRegister } from '@/features/auth/hooks/useAuth';
+import { sdk } from '@/lib/medusa';
 
 // ── Step 1 schema ─────────────────────────────────────────────────────────────
 const step1Schema = z.object({
@@ -165,9 +167,11 @@ export default function RegisterPage() {
   const [licenceDoc, setLicenceDoc] = useState<File | null>(null);
   const [step1Data, setStep1Data] = useState<Step1Data | null>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Step1Data>({
+  const { register, handleSubmit, formState: { errors } } = useForm<Step1Data>({
     resolver: zodResolver(step1Schema),
   });
+
+  const { mutate: signUp, isPending } = useRegister();
 
   const goTo = (next: number) => {
     setDirection(next > step ? 1 : -1);
@@ -180,7 +184,7 @@ export default function RegisterPage() {
     goTo(2);
   };
 
-  // Step 2 submit
+  // Step 2 submit — uploads docs then creates the Medusa customer account
   const onStep2 = async () => {
     if (!facility) {
       toast.error('Please select your facility type.');
@@ -190,12 +194,43 @@ export default function RegisterPage() {
       toast.error('Please upload at least one verification document.');
       return;
     }
+    if (!step1Data) return;
+
+    // 1. Upload documents to /store/customers/upload-docs
+    let cacDocUrl: string | undefined;
+    let licenceDocUrl: string | undefined;
+
     try {
-      // await api.post('/auth/register', { ...step1Data, facility, cacDoc, licenceDoc });
-      goTo(3);
+      const form = new FormData();
+      if (cacDoc)     form.append('files', cacDoc,     cacDoc.name);
+      if (licenceDoc) form.append('files', licenceDoc, licenceDoc.name);
+
+      const { urls } = await sdk.client.fetch<{ urls: string[] }>(
+        '/store/customers/upload-docs',
+        { method: 'POST', body: form },
+      );
+
+      if (cacDoc)     cacDocUrl     = urls[0];
+      if (licenceDoc) licenceDocUrl = cacDoc ? urls[1] : urls[0];
     } catch {
-      toast.error('Registration failed. Please try again.');
+      toast.error('Document upload failed. Please try again.');
+      return;
     }
+
+    // 2. Register account with document URLs saved to customer metadata
+    signUp(
+      {
+        firstName: step1Data.firstName,
+        lastName: step1Data.lastName,
+        email: step1Data.email,
+        password: step1Data.password,
+        phone: step1Data.phone,
+        facilityType: facility,
+        cacDocUrl,
+        licenceDocUrl,
+      },
+      { onSuccess: () => goTo(3) },
+    );
   };
 
   const leftPanelProps = {
@@ -429,7 +464,7 @@ export default function RegisterPage() {
                         size="lg"
                         className="flex-1"
                         rightIcon={<ArrowRight size={16} />}
-                        loading={isSubmitting}
+                        loading={isPending}
                         onClick={onStep2}
                       >
                         Submit
