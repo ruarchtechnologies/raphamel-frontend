@@ -1,21 +1,22 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, X, TrendingUp } from 'lucide-react';
+import { Search, X, TrendingUp, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/utils';
+import { useProductSearch } from '@/features/catalog/hooks/useProducts';
 
-// Mock suggestions — in production these come from the API
-const TRENDING = ['Nike sneakers', 'Samsung phone', 'Leather bag', 'Wireless earbuds', 'Perfume'];
-
-const MOCK_RESULTS = [
-  { id: '1', name: 'Premium Wireless Headphones', price: 45000, slug: 'premium-wireless-headphones', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80&h=80&fit=crop' },
-  { id: '2', name: 'Men\'s Running Shoes', price: 28000, slug: 'mens-running-shoes', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=80&h=80&fit=crop' },
-  { id: '3', name: 'Leather Crossbody Bag', price: 35000, slug: 'leather-crossbody-bag', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=80&h=80&fit=crop' },
+const TRENDING = [
+  'Surgical gloves',
+  'Nitrile gloves',
+  'Face masks',
+  'Syringe',
+  'Blood pressure monitor',
+  'Stethoscope',
 ];
 
 interface SearchBarProps {
@@ -24,17 +25,23 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ className, onClose }: SearchBarProps) {
-  const [query, setQuery] = useState('');
-  const [focused, setFocused] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const [query, setQuery]       = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [focused, setFocused]   = useState(false);
+  const inputRef                = useRef<HTMLInputElement>(null);
+  const containerRef            = useRef<HTMLDivElement>(null);
+  const router                  = useRouter();
 
-  const results = query.length > 1 ? MOCK_RESULTS.filter((p) =>
-    p.name.toLowerCase().includes(query.toLowerCase())
-  ) : [];
+  // Debounce query by 300ms
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 300);
+    return () => clearTimeout(t);
+  }, [query]);
 
-  const showDropdown = focused && (query.length === 0 || results.length > 0);
+  const { data, isFetching } = useProductSearch(debouncedQuery);
+  const results = data?.data ?? [];
+
+  const showDropdown = focused && (query.length === 0 || query.length >= 2);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -67,21 +74,23 @@ export function SearchBar({ className, onClose }: SearchBarProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setFocused(true)}
-          placeholder="Search products, brands, categories…"
+          placeholder="Search products, categories…"
           className={cn(
             'input-base pl-10 pr-10 h-11 rounded-full bg-gray-50 border-gray-200',
             'focus:bg-white focus:border-primary',
           )}
         />
-        {query && (
+        {query ? (
           <button
             type="button"
-            onClick={() => { setQuery(''); inputRef.current?.focus(); }}
+            onClick={() => { setQuery(''); setDebouncedQuery(''); inputRef.current?.focus(); }}
             className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
           >
             <X size={15} />
           </button>
-        )}
+        ) : isFetching ? (
+          <Loader2 size={15} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+        ) : null}
       </form>
 
       {/* Dropdown */}
@@ -112,35 +121,57 @@ export function SearchBar({ className, onClose }: SearchBarProps) {
                   ))}
                 </div>
               </div>
-            ) : (
+            ) : isFetching && results.length === 0 ? (
+              <div className="flex items-center justify-center gap-2 py-8 text-sm text-gray-400">
+                <Loader2 size={16} className="animate-spin" />
+                Searching…
+              </div>
+            ) : results.length > 0 ? (
               <ul className="py-2">
-                {results.map((product) => (
-                  <li key={product.id}>
-                    <Link
-                      href={`/products/${product.slug}`}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                      onClick={() => { setFocused(false); onClose?.(); }}
-                    >
-                      <div className="w-10 h-10 rounded-[6px] overflow-hidden bg-gray-100 flex-shrink-0">
-                        <Image src={product.image} alt={product.name} width={40} height={40} className="object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                        <p className="text-xs text-primary font-semibold">{formatPrice(product.price)}</p>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
+                {results.slice(0, 5).map((product) => {
+                  const thumbnail = product.images[0] ?? null;
+                  return (
+                    <li key={product.id}>
+                      <Link
+                        href={`/products/${product.slug}`}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                        onClick={() => { setFocused(false); onClose?.(); }}
+                      >
+                        <div className="w-10 h-10 rounded-[6px] overflow-hidden bg-gray-100 flex-shrink-0">
+                          {thumbnail ? (
+                            <Image src={thumbnail} alt={product.name} width={40} height={40} className="object-cover w-full h-full" />
+                          ) : (
+                            <div className="w-full h-full bg-gray-200" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                          <p className="text-xs text-primary font-semibold">{formatPrice(product.price)}</p>
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
                 <li className="border-t border-gray-100 px-4 py-2.5">
                   <button
+                    type="submit"
+                    form="search-form"
                     className="text-sm text-primary font-medium hover:underline"
-                    onClick={handleSubmit as any}
+                    onClick={() => {
+                      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+                      setFocused(false);
+                      onClose?.();
+                    }}
                   >
                     See all results for &ldquo;{query}&rdquo;
                   </button>
                 </li>
               </ul>
-            )}
+            ) : debouncedQuery.length >= 2 ? (
+              <div className="py-8 text-center text-sm text-gray-400">
+                No products found for &ldquo;{debouncedQuery}&rdquo;
+              </div>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>

@@ -5,7 +5,7 @@ import type { HttpTypes } from '@medusajs/types';
 
 // Request these extra fields on every product query.
 // Without "+variants.calculated_price" the price comes back undefined.
-const FIELDS = '+variants.calculated_price,+images,+categories,+variants.inventory_quantity';
+const FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images,*categories';
 
 // ── Mapper ────────────────────────────────────────────────────────────────────
 
@@ -26,14 +26,24 @@ function toProductEntity(p: HttpTypes.StoreProduct): ProductEntity {
 
   const category = p.categories?.[0];
 
+  const variants = p.variants
+    ?.map((v) => ({
+      id: v.id,
+      name: v.title ?? '',
+      stock: v.inventory_quantity ?? 0,
+      price: v.calculated_price?.calculated_amount ?? undefined,
+    }))
+    .filter((v) => v.id);
+
   return {
     id: p.id,
     name: p.title ?? '',
     slug: p.handle ?? p.id,
     description: p.description ?? undefined,
+    sku: variant?.sku ?? undefined,
     price,
     compareAtPrice,
-    stock: variant?.inventory_quantity ?? 0,
+    stock: variant?.inventory_quantity ?? 999,
     stockUnit: 'unit',
     minimumOrderQuantity: 1,
     images,
@@ -44,6 +54,7 @@ function toProductEntity(p: HttpTypes.StoreProduct): ProductEntity {
     categoryId: category?.id,
     categoryName: category?.name,
     categorySlug: category?.handle ?? undefined,
+    variants: variants?.length ? variants : undefined,
     condition: 'new',
     createdAt: p.created_at ?? '',
     updatedAt: p.updated_at ?? '',
@@ -80,6 +91,11 @@ function toMedusaOrder(sortBy?: ProductFilters['sortBy']): string | undefined {
 
 // ── API functions ─────────────────────────────────────────────────────────────
 
+async function getRegionId(): Promise<string | undefined> {
+  const { regions } = await sdk.store.region.list();
+  return regions?.[0]?.id;
+}
+
 export async function fetchProducts(
   filters: ProductFilters = {},
 ): Promise<PaginatedResponse<ProductEntity>> {
@@ -87,32 +103,43 @@ export async function fetchProducts(
   const page   = filters.page  ?? 1;
   const offset = (page - 1) * limit;
 
+  const regionId = await getRegionId();
+
   const params: Record<string, unknown> = { fields: FIELDS, limit, offset };
+  if (regionId)           params.region_id   = regionId;
   if (filters.search)     params.q           = filters.search;
   if (filters.categoryId) params.category_id = [filters.categoryId];
   const order = toMedusaOrder(filters.sortBy);
   if (order) params.order = order;
 
   const { products, count } = await sdk.store.product.list(params);
-  return toPaginatedResponse(products, count ?? 0, offset, limit);
+
+  // Only show products attached to at least one category
+  const categorised = filters.categoryId
+    ? products
+    : products.filter((p) => p.categories && p.categories.length > 0);
+
+  return toPaginatedResponse(categorised, count ?? 0, offset, limit);
 }
 
 export async function fetchProductBySlug(slug: string): Promise<ProductEntity> {
-  const { products } = await sdk.store.product.list({
-    fields: FIELDS,
-    handle: slug,
-    limit: 1,
-  });
+  const regionId = await getRegionId();
+
+  const params: Record<string, unknown> = { fields: FIELDS, handle: slug, limit: 1 };
+  if (regionId) params.region_id = regionId;
+
+  const { products } = await sdk.store.product.list(params);
 
   if (!products.length) throw new Error(`Product not found: ${slug}`);
   return toProductEntity(products[0]);
 }
 
 export async function fetchFeaturedProducts(limit = 8): Promise<ProductEntity[]> {
-  const { products } = await sdk.store.product.list({
-    fields: FIELDS,
-    limit,
-  });
+  const regionId = await getRegionId();
+  const params: Record<string, unknown> = { fields: FIELDS, limit };
+  if (regionId) params.region_id = regionId;
+
+  const { products } = await sdk.store.product.list(params);
   return products.map(toProductEntity);
 }
 

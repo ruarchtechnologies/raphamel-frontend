@@ -60,7 +60,7 @@ const outfit = Outfit({
  */
 export const metadata: Metadata = {
   title: {
-    default: 'Raphamel — Nigeria\'s B2B Medical Supply Company',
+    default: 'Raphamel — Medical Supplies Nigeria',
     template: '%s | Raphamel',
   },
   description:

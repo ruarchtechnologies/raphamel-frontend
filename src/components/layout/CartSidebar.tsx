@@ -5,20 +5,26 @@ import Link from 'next/link';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Drawer } from './Drawer';
 import { Button } from '@/components/ui/Button';
-import { useCartStore } from '@/stores/cart.store';
+import { useCart, useUpdateCartItem, useRemoveCartItem } from '@/features/cart/hooks/useCart';
 import { useUIStore } from '@/stores/ui.store';
 import { formatPrice } from '@/lib/utils';
 
 export function CartSidebar() {
-  const { items, removeItem, updateQuantity, subtotal } = useCartStore();
   const { cartOpen, setCartOpen } = useUIStore();
+  const { data: cart, isLoading } = useCart();
+  const { mutate: updateItem, isPending: isUpdating } = useUpdateCartItem();
+  const { mutate: removeItem, isPending: isRemoving } = useRemoveCartItem();
+
+  const items    = cart?.items ?? [];
+  const subtotal = cart?.subtotal ?? 0;
+  const isBusy   = isUpdating || isRemoving;
 
   const footer = (
     <div className="space-y-3">
       <div className="flex items-center justify-between text-sm text-gray-600">
         <span>Subtotal</span>
         <span className="font-semibold text-gray-900 text-base">
-          {formatPrice(subtotal())}
+          {formatPrice(subtotal)}
         </span>
       </div>
       <p className="text-xs text-gray-400">Shipping & taxes calculated at checkout</p>
@@ -43,7 +49,21 @@ export function CartSidebar() {
       title={`Shopping Cart (${items.length})`}
       footer={items.length > 0 ? footer : undefined}
     >
-      {items.length === 0 ? (
+      {isLoading ? (
+        /* Skeleton while the cart loads on first render */
+        <div className="space-y-4 p-4">
+          {[1, 2].map((i) => (
+            <div key={i} className="flex gap-3 animate-pulse">
+              <div className="w-16 h-20 bg-gray-100 rounded-[6px] shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-100 rounded w-3/4" />
+                <div className="h-3 bg-gray-100 rounded w-1/3" />
+                <div className="h-3 bg-gray-100 rounded w-1/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full py-16 px-6 text-center">
           <ShoppingBag size={48} className="text-gray-200 mb-4" />
           <p className="font-semibold text-gray-700 mb-1">Your cart is empty</p>
@@ -54,66 +74,81 @@ export function CartSidebar() {
         </div>
       ) : (
         <ul className="divide-y divide-gray-100">
-          {items.map((item) => (
-            <li key={`${item.productId}-${item.variantId}`} className="flex gap-3 p-4">
-              <Link
-                href={`/products/${item.slug}`}
-                className="flex-shrink-0 w-16 h-20 bg-gray-50 rounded-[6px] overflow-hidden"
-                onClick={() => setCartOpen(false)}
-              >
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  width={64}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
-              </Link>
+          {items.map((item) => {
+            const image    = item.thumbnail ?? '/images/product-placeholder.png';
+            const handle   = (item as { variant?: { product?: { handle?: string } } }).variant?.product?.handle ?? '#';
+            const varTitle = (item as { subtitle?: string }).subtitle;
 
-              <div className="flex-1 min-w-0">
+            return (
+              <li key={item.id} className="flex gap-3 p-4">
                 <Link
-                  href={`/products/${item.slug}`}
-                  className="text-sm font-medium text-gray-900 hover:text-primary line-clamp-2 leading-snug"
+                  href={`/products/${handle}`}
+                  className="flex-shrink-0 w-16 h-20 bg-gray-50 rounded-[6px] overflow-hidden"
                   onClick={() => setCartOpen(false)}
                 >
-                  {item.name}
+                  <Image
+                    src={image}
+                    alt={item.title ?? 'Product'}
+                    width={64}
+                    height={80}
+                    className="w-full h-full object-cover"
+                  />
                 </Link>
-                {item.variantName && (
-                  <p className="text-xs text-gray-400 mt-0.5">{item.variantName}</p>
-                )}
-                <p className="text-sm font-semibold text-primary mt-1">
-                  {formatPrice(item.price)}
-                </p>
 
-                <div className="flex items-center justify-between mt-2">
-                  {/* Qty stepper */}
-                  <div className="flex items-center border border-gray-200 rounded-[6px] overflow-hidden">
+                <div className="flex-1 min-w-0">
+                  <Link
+                    href={`/products/${handle}`}
+                    className="text-sm font-medium text-gray-900 hover:text-primary line-clamp-2 leading-snug"
+                    onClick={() => setCartOpen(false)}
+                  >
+                    {item.title}
+                  </Link>
+
+                  {varTitle && (
+                    <p className="text-xs text-gray-400 mt-0.5">{varTitle}</p>
+                  )}
+
+                  <p className="text-sm font-semibold text-primary mt-1">
+                    {formatPrice((item as { unit_price?: number }).unit_price ?? 0)}
+                  </p>
+
+                  <div className="flex items-center justify-between mt-2">
+                    {/* Quantity stepper */}
+                    <div className="flex items-center border border-gray-200 rounded-[6px] overflow-hidden">
+                      <button
+                        className="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-40"
+                        disabled={isBusy || item.quantity <= 1}
+                        onClick={() =>
+                          cart && updateItem({ cartId: cart.id, lineItemId: item.id, quantity: item.quantity - 1 })
+                        }
+                      >
+                        <Minus size={12} />
+                      </button>
+                      <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                      <button
+                        className="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-40"
+                        disabled={isBusy}
+                        onClick={() =>
+                          cart && updateItem({ cartId: cart.id, lineItemId: item.id, quantity: item.quantity + 1 })
+                        }
+                      >
+                        <Plus size={12} />
+                      </button>
+                    </div>
+
+                    {/* Remove */}
                     <button
-                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-                      onClick={() => updateQuantity(item.productId, item.quantity - 1, item.variantId)}
+                      className="text-gray-400 hover:text-rose-500 transition-colors p-1 disabled:opacity-40"
+                      disabled={isBusy}
+                      onClick={() => cart && removeItem({ cartId: cart.id, lineItemId: item.id })}
                     >
-                      <Minus size={12} />
-                    </button>
-                    <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                    <button
-                      className="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1, item.variantId)}
-                    >
-                      <Plus size={12} />
+                      <Trash2 size={14} />
                     </button>
                   </div>
-
-                  {/* Remove */}
-                  <button
-                    className="text-gray-400 hover:text-rose-500 transition-colors p-1"
-                    onClick={() => removeItem(item.productId, item.variantId)}
-                  >
-                    <Trash2 size={14} />
-                  </button>
                 </div>
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       )}
     </Drawer>

@@ -29,7 +29,7 @@ import { PromoStrip } from '@/components/home/PromoStrip';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Raphamel — Nigeria\'s B2B Medical Supply Company',
+  title: 'Raphamel',
   description:
     'Hospital consumables, surgical equipment, diagnostic devices and PPE — NAFDAC-compliant medical products delivered directly to healthcare facilities across Nigeria.',
 };

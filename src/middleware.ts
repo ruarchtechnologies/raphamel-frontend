@@ -1,40 +1,74 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Inlined here — middleware edge runtime can't reliably import local modules
+const AUTH_COOKIE   = 'raphamel_auth';
+const STATUS_COOKIE = 'raphamel_status';
+
 /**
  * WAITLIST_MODE — when set to "true" in .env, all routes except /waitlist
- * are redirected to /waitlist. This lets you put the whole site in
- * pre-launch mode with a single env flag.
+ * are redirected to /waitlist.
  *
  * Usage in .env:
  *   WAITLIST_MODE=true
  */
 const WAITLIST_MODE = process.env.WAITLIST_MODE === 'true';
 
-// Paths that are always allowed through — even in waitlist mode
 const ALWAYS_ALLOWED = ['/waitlist', '/favicon.ico', '/logo.png'];
 const ALWAYS_ALLOWED_PREFIXES = ['/_next', '/api'];
 
-export function middleware(request: NextRequest) {
-  if (!WAITLIST_MODE) return NextResponse.next();
+/** Routes that require the user to be logged in. */
+const PROTECTED_PREFIXES = ['/account', '/checkout'];
 
+/** Auth pages — already-logged-in users should not land here. */
+const AUTH_PAGES = ['/login', '/register', '/forgot-password', '/reset-password'];
+
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow static assets and waitlist itself
-  const isAllowed =
-    ALWAYS_ALLOWED.some((p) => pathname === p) ||
-    ALWAYS_ALLOWED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  // ── Waitlist mode ──────────────────────────────────────────────────────────
+  if (WAITLIST_MODE) {
+    const isAllowed =
+      ALWAYS_ALLOWED.some((p) => pathname === p) ||
+      ALWAYS_ALLOWED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+    if (!isAllowed) return NextResponse.redirect(new URL('/waitlist', request.url));
+    return NextResponse.next();
+  }
 
-  if (isAllowed) return NextResponse.next();
+  const isAuthenticated = request.cookies.has(AUTH_COOKIE);
+  const verificationStatus = request.cookies.get(STATUS_COOKIE)?.value;
 
-  return NextResponse.redirect(new URL('/waitlist', request.url));
+  // ── Protect /account/* and /checkout — redirect unauthenticated users ─────
+  const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  if (isProtected && !isAuthenticated) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('next', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // ── Redirect logged-in users away from auth pages ─────────────────────────
+  const isAuthPage = AUTH_PAGES.some((p) => pathname === p);
+  if (isAuthPage && isAuthenticated) {
+    return NextResponse.redirect(new URL('/account', request.url));
+  }
+
+  // ── Gate non-approved users — only /account is accessible ────────────────
+  // Only applies when the status cookie is explicitly set to a non-approved value.
+  // Users without the cookie (old sessions) are let through until they visit /account,
+  // which syncs the cookie.
+  if (
+    isAuthenticated &&
+    verificationStatus &&
+    verificationStatus !== 'approved' &&
+    !pathname.startsWith('/account')
+  ) {
+    return NextResponse.redirect(new URL('/account', request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  /*
-   * Match all paths EXCEPT Next.js internals and static file extensions.
-   * This keeps middleware lightweight — it only runs on meaningful routes.
-   */
   matcher: [
     '/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],

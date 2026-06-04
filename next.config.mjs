@@ -11,7 +11,10 @@ const nextConfig = {
       { protocol: 'http',  hostname: 'localhost' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'via.placeholder.com' },
-      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '**' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'medusa-public-images.s3.eu-west-1.amazonaws.com' },
+      { protocol: 'https', hostname: '*.s3.amazonaws.com' },
+      { protocol: 'https', hostname: '*.s3.*.amazonaws.com' },
     ],
   },
   env: {

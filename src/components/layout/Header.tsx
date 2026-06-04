@@ -27,12 +27,14 @@ import { useEffect, useState } from 'react';
 import {
   Menu, Heart, ShoppingBag, User, ChevronDown, Search,
 } from 'lucide-react';
+// Note: User is still used in the mobile Account icon link below
 import { SearchBar } from './SearchBar';
 import { CartSidebar } from './CartSidebar';
 import { MobileMenu } from './MobileMenu';
+import { UserMenu } from './UserMenu';
 import { useUIStore } from '@/stores/ui.store';
-import { useCartStore } from '@/stores/cart.store';
-import { useAuthStore } from '@/stores/auth.store';
+import { useCartItemCount } from '@/features/cart/hooks/useCart';
+import { useMe } from '@/features/auth/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 // ── Navigation configuration ─────────────────────────────────────────────────
@@ -125,31 +127,16 @@ function NavLink({ item }: { item: (typeof NAV_LINKS)[number] }) {
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { setCartOpen, setMenuOpen } = useUIStore();
+  const itemCount = useCartItemCount();
+  const { data: me, isLoading: authLoading } = useMe();
 
-  /*
-   * FLUTTER EQUIV:
-   *   useCartStore((s) => s.itemCount()) is like:
-   *   context.select<CartModel, int>((cart) => cart.itemCount)
-   *
-   * The selector `(s) => s.itemCount()` means: "only re-render Header
-   * when the itemCount value changes" — NOT when other cart fields change.
-   * This is like Riverpod's select() or BLoC's buildWhen.
-   */
-  const itemCount  = useCartStore((s) => s.itemCount());
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
-
-  /*
-   * FLUTTER EQUIV: initState() + addPostFrameCallback + ScrollController
-   *
-   * useEffect with [] runs ONCE after first render (= initState).
-   * The returned function runs on unmount (= dispose).
-   * { passive: true } is a performance hint to the browser — no Flutter equiv.
-   */
   useEffect(() => {
+    setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll); // cleanup = dispose
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
@@ -231,7 +218,7 @@ export function Header() {
                 aria-label="Cart"
               >
                 <ShoppingBag size={20} />
-                {itemCount > 0 && (
+                {mounted && itemCount > 0 && (
                   /*
                    * FLUTTER EQUIV:
                    *   Stack → Positioned(top: -2, right: -2, child: Container(...))
@@ -277,16 +264,10 @@ export function Header() {
                 Supplier Portal
               </Link>
               */}
-              {isLoggedIn ? (
-                <Link
-                  href="/account"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User size={15} style={{ color: 'var(--color-primary)' }} />
-                  </div>
-                  My Account
-                </Link>
+              {authLoading ? (
+                <div className="w-20 h-8 bg-gray-100 rounded-[6px] animate-pulse" />
+              ) : me ? (
+                <UserMenu />
               ) : (
                 <>
                   <Link

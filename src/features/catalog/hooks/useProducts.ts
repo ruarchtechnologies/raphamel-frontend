@@ -36,7 +36,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchProducts, fetchFeaturedProducts, fetchProductsByCategory } from '@/data/api/products.api';
+import { fetchProducts, fetchFeaturedProducts, fetchProductsByCategory, fetchProductBySlug } from '@/data/api/products.api';
 import type { ProductFilters } from '@/types/index';
 
 // ── Query key factory ────────────────────────────────────────────────────────
@@ -56,6 +56,7 @@ export const productKeys = {
     [...productKeys.all, 'category', slug, filters] as const,
   details: () => [...productKeys.all, 'detail'] as const,
   detail: (slug: string) => [...productKeys.details(), slug] as const,
+  search: (query: string) => [...productKeys.all, 'search', query] as const,
 };
 
 // ── Hooks ────────────────────────────────────────────────────────────────────
@@ -93,6 +94,30 @@ export function useFeaturedProducts(limit = 8) {
     queryKey: productKeys.featured(limit),
     queryFn: () => fetchFeaturedProducts(limit),
     staleTime: 1000 * 60 * 10, // 10 min — homepage data changes less often
+  });
+}
+
+/** Fetch a single product by its slug/handle. */
+export function useProductBySlug(slug: string) {
+  return useQuery({
+    queryKey: productKeys.detail(slug),
+    queryFn: () => fetchProductBySlug(slug),
+    enabled: Boolean(slug),
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
+}
+
+/**
+ * Search products by keyword. Only fires when query is >= 2 characters.
+ * Short staleTime so results feel live while the user types.
+ */
+export function useProductSearch(query: string) {
+  return useQuery({
+    queryKey: productKeys.search(query),
+    queryFn: () => fetchProducts({ search: query }),
+    enabled: query.trim().length >= 2,
+    staleTime: 1000 * 10, // 10 seconds — search results should feel fresh
   });
 }
 

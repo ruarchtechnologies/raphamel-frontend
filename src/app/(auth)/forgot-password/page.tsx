@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { AuthLeftPanel } from '@/components/auth/AuthLeftPanel';
+import { useForgotPassword } from '@/features/auth/hooks/useAuth';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -20,13 +21,15 @@ type FormData = z.infer<typeof schema>;
 export default function ForgotPasswordPage() {
   const [sent, setSent]   = useState(false);
   const [email, setEmail] = useState('');
+  const forgotPassword    = useForgotPassword();
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: FormData) => {
-    // await api.post('/auth/forgot-password', { email: data.email });
+    await forgotPassword.mutateAsync(data.email).catch(() => {});
+    // Always show success — never reveal whether the email exists
     setEmail(data.email);
     setSent(true);
   };
@@ -74,7 +77,7 @@ export default function ForgotPasswordPage() {
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
                   <Input
                     label="Email address"
                     type="email"

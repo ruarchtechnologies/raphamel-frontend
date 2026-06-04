@@ -33,6 +33,8 @@ interface CategoryCardProps {
   category: CategoryEntity;
   /** Animation delay index for stagger effect */
   index?: number;
+  /** Pass true for the first visible card (LCP candidate) */
+  priority?: boolean;
 }
 
 // FLUTTER EQUIV: AnimationController / TweenSequence for stagger
@@ -46,7 +48,7 @@ const cardVariants = {
   }),
 };
 
-export function CategoryCard({ category, index = 0 }: CategoryCardProps) {
+export function CategoryCard({ category, index = 0, priority = false }: CategoryCardProps) {
   return (
     <motion.div
       custom={index}
@@ -72,6 +74,8 @@ export function CategoryCard({ category, index = 0 }: CategoryCardProps) {
             src={category.image ?? '/images/categories/placeholder.jpg'}
             alt={category.name}
             fill
+            priority={priority}
+            loading={priority ? 'eager' : 'lazy'}
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />

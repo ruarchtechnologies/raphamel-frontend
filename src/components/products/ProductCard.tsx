@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
 import { PriceDisplay } from './PriceDisplay';
-import { useCartStore } from '@/stores/cart.store';
+import { useAddToCart } from '@/features/cart/hooks/useCart';
 import { getDiscountPercent, truncate } from '@/lib/utils';
 
 export interface ProductCardData {
@@ -26,6 +26,7 @@ export interface ProductCardData {
   isFeatured?: boolean;
   stock?: number;
   badge?: string;
+  variantId?: string;
 }
 
 interface ProductCardProps {
@@ -35,7 +36,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCardProps) {
-  const addItem = useCartStore((s) => s.addItem);
+  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
   const isOutOfStock = product.stock === 0;
   const discountPercent =
     product.compareAtPrice
@@ -44,23 +45,24 @@ export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCard
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (isOutOfStock) return;
-    addItem({
-      id: product.id,
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      slug: product.slug,
-    });
-    toast.success('Added to cart', {
-      description: truncate(product.name, 40),
-      duration: 2000,
-    });
+    e.stopPropagation();
+    if (isOutOfStock || !product.variantId) return;
+    addToCart(
+      { variantId: product.variantId, quantity: 1 },
+      {
+        onSuccess: () => {
+          toast.success('Added to cart', {
+            description: truncate(product.name, 40),
+            duration: 2000,
+          });
+        },
+      },
+    );
   };
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     toast.success('Added to wishlist');
   };
 
@@ -100,12 +102,15 @@ export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCard
               <PriceDisplay price={product.price} compareAtPrice={product.compareAtPrice} size="sm" />
             </div>
           </div>
-          <button
-            onClick={handleAddToCart}
-            className="self-center flex-shrink-0 h-9 px-3 bg-primary text-white text-xs font-semibold rounded-[6px] hover:bg-[#005bb5] transition-colors"
-          >
-            Add to Cart
-          </button>
+          {product.variantId && (
+            <button
+              onClick={handleAddToCart}
+              disabled={isAddingToCart || isOutOfStock}
+              className="self-center flex-shrink-0 h-9 px-3 bg-primary text-white text-xs font-semibold rounded-[6px] hover:bg-[#005bb5] disabled:opacity-60 transition-colors"
+            >
+              {isAddingToCart ? 'Adding…' : 'Add to Cart'}
+            </button>
+          )}
         </Link>
       </motion.div>
     );
@@ -162,14 +167,15 @@ export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCard
             </div>
 
             {/* Add to cart slide-up */}
-            {!isOutOfStock && (
+            {!isOutOfStock && product.variantId && (
               <div className="product-add-cart px-2 pb-2">
                 <button
                   onClick={handleAddToCart}
-                  className="w-full h-9 bg-gray-900 hover:bg-primary text-white text-xs font-semibold rounded-[6px] flex items-center justify-center gap-2 transition-colors"
+                  disabled={isAddingToCart}
+                  className="w-full h-9 bg-gray-900 hover:bg-primary disabled:opacity-60 text-white text-xs font-semibold rounded-[6px] flex items-center justify-center gap-2 transition-colors"
                 >
                   <ShoppingCart size={14} />
-                  Add to Cart
+                  {isAddingToCart ? 'Adding…' : 'Add to Cart'}
                 </button>
               </div>
             )}
