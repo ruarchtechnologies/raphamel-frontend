@@ -110,7 +110,7 @@ export interface PaymentSessionResult {
 
 export async function initializePaymentSession(cartId: string): Promise<PaymentSessionResult> {
   const { payment_providers } = await sdk.store.payment.listPaymentProviders({
-    region_id: REGION_ID,
+    ...(REGION_ID && { region_id: REGION_ID }),
   });
 
   // Prefer a Paystack provider if installed; fall back to system default; then any available
