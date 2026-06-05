@@ -9,6 +9,7 @@ const nextConfig = {
     qualities: [75, 85],
     remotePatterns: [
       { protocol: 'http',  hostname: 'localhost' },
+      { protocol: 'https', hostname: 'staging.api.raphamel.com' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'via.placeholder.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
