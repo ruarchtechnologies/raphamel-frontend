@@ -27,9 +27,9 @@ export function useCategories() {
   });
 }
 
-/** Fetch a single category by slug (for category detail page). */
+/** Fetch a single category by slug. Returns null if not found in Medusa. */
 export function useCategoryBySlug(slug: string) {
-  return useQuery({
+  return useQuery<import('@/domain/entities/category.entity').CategoryEntity | null>({
     queryKey: categoryKeys.detail(slug),
     queryFn: () => fetchCategoryBySlug(slug),
     enabled: Boolean(slug),

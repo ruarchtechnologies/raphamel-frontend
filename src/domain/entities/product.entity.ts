@@ -86,6 +86,13 @@ export interface ProductEntity {
 
   tags?: string[];
 
+  variants?: Array<{
+    id: string;
+    name: string;
+    stock: number;
+    price?: number;
+  }>;
+
   certifications?: ProductCertification[];
   condition: ProductCondition;
 

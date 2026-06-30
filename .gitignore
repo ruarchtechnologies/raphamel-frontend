@@ -22,8 +22,8 @@ node_modules/
 .env.test.local
 .env.production.local
 
-# Local dev / migration docs
-ASSET_MIGRATION.md
+# Markdown documents (all local-only)
+*.md
 
 # TypeScript
 *.tsbuildinfo
@@ -31,6 +31,8 @@ ASSET_MIGRATION.md
 # Testing / coverage
 /coverage
 /.nyc_output
+/playwright-report
+/test-results
 
 # Vercel
 .vercel
@@ -52,14 +54,15 @@ Thumbs.db
 .idea/
 *.sw?
 
-# Claude / AI tools
+# Claude / AI tools — all local-only, never committed
 .claude/
+*.claude.md
+claude.json
 
 # Project docs (local only)
-CLAUDE.md
-ROADMAP.md
 SPRINT.md
 tickets/
+memory/
 
 # Temporary
 tmp/

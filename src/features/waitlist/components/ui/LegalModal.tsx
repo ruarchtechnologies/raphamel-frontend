@@ -46,7 +46,7 @@ const PRIVACY_SECTIONS: Section[] = [
   {
     title: 'Legal Basis for Processing (NDPR)',
     content:
-      'We process your personal data on the following lawful bases: (a) Consent — by submitting the waitlist form, you expressly consent to the processing of your data as described in this Policy; (b) Legitimate Interests — for analytics, security, and platform improvement; (c) Legal Obligation — where processing is required to comply with applicable Nigerian laws and regulations. You may withdraw your consent at any time by contacting us at privacy@raphamel.ng.',
+      'We process your personal data on the following lawful bases: (a) Consent — by submitting the waitlist form, you expressly consent to the processing of your data as described in this Policy; (b) Legitimate Interests — for analytics, security, and platform improvement; (c) Legal Obligation — where processing is required to comply with applicable Nigerian laws and regulations. You may withdraw your consent at any time by contacting us at support@raphamel.com.',
   },
   {
     title: 'Data Sharing and Disclosure',
@@ -87,7 +87,7 @@ const PRIVACY_SECTIONS: Section[] = [
   {
     title: 'Contact Us',
     content:
-      'If you have any questions about this Privacy Policy or wish to exercise your rights, please contact our Data Protection Officer at: privacy@raphamel.ng | Raphamel Healthcare, Lagos, Nigeria.',
+      'If you have any questions about this Privacy Policy or wish to exercise your rights, please contact our Data Protection Officer at: support@raphamel.com | Raphamel Healthcare, Lagos, Nigeria.',
   },
 ];
 
@@ -159,7 +159,7 @@ const TERMS_SECTIONS: Section[] = [
   {
     title: 'Contact Us',
     content:
-      'For questions about these Terms, please contact us at: raphamel.tech@gmail.com | Raphamel Healthcare, Lagos, Nigeria.',
+      'For questions about these Terms, please contact us at: support@raphamel.com | Raphamel Healthcare, Lagos, Nigeria.',
   },
 ];
 
@@ -178,7 +178,7 @@ function DocSection({ section, index }: { section: Section; index: number }) {
         {index + 1}. {section.title}
       </h3>
       {Array.isArray(section.content) ? (
-        <ul style={{ margin: 0, padding: 0, paddingLeft: '22px' }}>
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderLeft: '2px solid rgba(255,255,255,0.1)', paddingLeft: '16px' }}>
           {section.content.map((item, i) => (
             <li key={i} style={{
               fontFamily: SANS,

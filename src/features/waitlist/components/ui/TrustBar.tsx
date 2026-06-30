@@ -3,7 +3,7 @@ import { SANS, MONO } from '../../fonts';
 export function TrustBar() {
   return (
     <section style={{ background: '#FAFAF8' }} className="py-8">
-      <div className="max-w-7xl mx-auto px-6">
+      <div style={{ paddingLeft: "1.5rem", paddingRight: "1.5rem" }}>
         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
           <div
             className="text-sm font-semibold uppercase tracking-wide"

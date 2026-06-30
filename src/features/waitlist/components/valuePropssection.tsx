@@ -10,7 +10,7 @@ export function ValuePropsSection() {
 
   return (
     <section ref={valueRef.ref} className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+      <div style={{ paddingLeft: "1.5rem", paddingRight: "1.5rem" }}>
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={valueRef.isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}

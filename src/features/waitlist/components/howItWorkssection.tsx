@@ -17,7 +17,7 @@ export function HowItWorksSection() {
       className="overflow-hidden"
       style={{ background: '#F0F4F8', padding: 'clamp(48px, 7vw, 96px) 0' }}
     >
-      <div className="max-w-7xl mx-auto" style={{ padding: '0 clamp(24px, 8vw, 120px)' }}>
+      <div style={{ padding: '0 clamp(24px, 8vw, 120px)' }}>
 
         {/* ── Card container ── */}
         <div
@@ -235,7 +235,7 @@ export function HowItWorksSection() {
             </div>
 
             {/* RIGHT — Image card */}
-            <div className="w-full lg:flex-1">
+            <div style={{ flex: '0 1 auto', width: '100%' }}>
               <motion.div
                   initial={{ opacity: 0, scale: 0.97, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}

@@ -4,7 +4,7 @@ import { MONO, SANS } from '../../fonts';
 export function Nav() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-      <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+      <div className="flex items-center justify-between" style={{ padding: '1.5rem' }}>
         <Link
           href="/"
           className="flex items-center gap-0.5 px-3 py-1.5 rounded-full"

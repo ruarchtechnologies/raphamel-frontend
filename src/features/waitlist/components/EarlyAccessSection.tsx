@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -526,27 +527,6 @@ function SuccessConfirmation() {
         </p>
       </div>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '9px 22px',
-        borderRadius: '999px',
-        background: 'rgba(250,204,21,0.07)',
-        border: '1px solid rgba(250,204,21,0.2)',
-      }}>
-        <span style={{
-          width: '6px', height: '6px', borderRadius: '50%',
-          background: '#FACC15', display: 'inline-block',
-          boxShadow: '0 0 8px rgba(250,204,21,0.7)',
-        }} />
-        <span style={{
-          fontFamily: MONO, fontSize: '11px', fontWeight: 600,
-          color: '#FACC15', letterSpacing: '0.09em', textTransform: 'uppercase',
-        }}>
-          Early Access Reserved
-        </span>
-      </div>
     </motion.div>
   );
 }
@@ -555,6 +535,7 @@ function SuccessConfirmation() {
 
 export function EarlyAccessSection() {
   const [submitted, setSubmitted] = useState(false);
+  const [panelUnoptimized, setPanelUnoptimized] = useState(false);
 
   return (
     <section
@@ -587,7 +568,7 @@ export function EarlyAccessSection() {
         pointerEvents: 'none',
       }} />
 
-      <div className="max-w-7xl mx-auto" style={{ padding: '0 clamp(24px, 5vw, 80px)', position: 'relative', zIndex: 1 }}>
+      <div style={{ padding: '0 clamp(24px, 5vw, 80px)', position: 'relative', zIndex: 1 }}>
         <div className="ea-split">
 
           {/* ── Left: image panel ── */}
@@ -595,11 +576,17 @@ export function EarlyAccessSection() {
             className="ea-img-col"
             style={{ borderRadius: '24px', overflow: 'hidden', height: '460px', alignSelf: 'flex-start', position: 'sticky', top: '40px' }}
           >
-            <img
-              src="/images/early-access-left.png"
-              alt=""
-              style={{ width: '100%', height: '560px', objectFit: 'cover', objectPosition: '75% center', display: 'block' }}
-            />
+            <div style={{ position: 'relative', width: '100%', height: '560px' }}>
+              <Image
+                src="/images/early-access-left.png"
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 0px, 52vw"
+                style={{ objectFit: 'cover', objectPosition: '75% center' }}
+                unoptimized={panelUnoptimized}
+                onError={() => setPanelUnoptimized(true)}
+              />
+            </div>
           </div>
 
           {/* ── Right: form card ── */}

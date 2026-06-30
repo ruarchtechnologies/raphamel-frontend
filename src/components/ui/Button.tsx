@@ -81,6 +81,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       disabled,
       asChild = false,
+      type = 'button',
       ...props
     },
     ref,
@@ -91,13 +92,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref as any}
         className={cn(buttonVariants({ variant, size, rounded, className }))}
         disabled={!asChild ? (disabled || loading) : undefined}
+        type={asChild ? undefined : type}
         {...props}
       >
-        {asChild ? children : (
+        {asChild ? children : loading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
           <>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : leftIcon}
+            {leftIcon}
             {children}
-            {!loading && rightIcon}
+            {rightIcon}
           </>
         )}
       </Comp>

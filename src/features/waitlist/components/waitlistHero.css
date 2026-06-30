@@ -644,12 +644,11 @@ body {
 @media (min-width: 1024px) {
   .cat-grid {
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 300px 300px 270px 270px;
+    grid-template-rows: 300px 300px 270px;
     grid-template-areas:
       "ca ca cb cd"
       "ca ca cc ce"
-      "cf cg ch ck"
-      "ci ci cj cj";
+      "cf ch ci cj";
     gap: 12px;
     grid-auto-rows: unset;
   }
@@ -678,10 +677,6 @@ body {
     grid-area: cf;
   }
 
-  .cat-g {
-    grid-area: cg;
-  }
-
   .cat-h {
     grid-area: ch;
   }
@@ -692,10 +687,6 @@ body {
 
   .cat-j {
     grid-area: cj;
-  }
-
-  .cat-k {
-    grid-area: ck;
   }
 }
 

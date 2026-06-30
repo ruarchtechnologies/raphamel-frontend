@@ -1,78 +1,158 @@
-/**
- * FLUTTER EQUIV: lib/data/datasources/product_remote_datasource.dart
- *
- * In Flutter:
- *   class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
- *     final http.Client client;
- *     Future<List<ProductModel>> getProducts(ProductFilters filters) async {
- *       final response = await client.get(Uri.parse('$baseUrl/products?...'));
- *       ...
- *     }
- *   }
- *
- * In React/Next.js: a plain module with async functions that use our
- * pre-configured Axios instance (src/lib/api.ts). No class needed — just
- * functions. React Query hooks will call these from src/features/.
- *
- * RULE: Components NEVER call these functions directly.
- *       Components → React Query hook → this file → API
- * (Flutter equiv: Widget → BLoC/Cubit → Repository → DataSource → HTTP)
- */
-
-import api from '@/lib/api';
+import { sdk } from '@/lib/medusa';
 import type { PaginatedResponse, ProductFilters } from '@/types/index';
 import type { ProductEntity } from '@/domain/entities/product.entity';
+import type { HttpTypes } from '@medusajs/types';
 
-const BASE = '/products';
+// Request these extra fields on every product query.
+// Without "+variants.calculated_price" the price comes back undefined.
+const FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images,*categories';
 
-/**
- * Fetch paginated products with optional filters.
- *
- * FLUTTER EQUIV:
- *   Future<PaginatedResult<Product>> getProducts(ProductFilters filters)
- */
+// ── Mapper ────────────────────────────────────────────────────────────────────
+
+function toProductEntity(p: HttpTypes.StoreProduct): ProductEntity {
+  const variant = p.variants?.[0];
+  const calcPrice = variant?.calculated_price;
+  const price = calcPrice?.calculated_amount ?? 0;
+  const originalAmount = calcPrice?.original_amount ?? 0;
+  const compareAtPrice = originalAmount > price ? originalAmount : undefined;
+
+  const images: string[] = [];
+  if (p.thumbnail) images.push(p.thumbnail);
+  if (p.images) {
+    for (const img of p.images) {
+      if (img.url && img.url !== p.thumbnail) images.push(img.url);
+    }
+  }
+
+  const category = p.categories?.[0];
+
+  const variants = p.variants
+    ?.map((v) => ({
+      id: v.id,
+      name: v.title ?? '',
+      stock: v.inventory_quantity ?? 0,
+      price: v.calculated_price?.calculated_amount ?? undefined,
+    }))
+    .filter((v) => v.id);
+
+  return {
+    id: p.id,
+    name: p.title ?? '',
+    slug: p.handle ?? p.id,
+    description: p.description ?? undefined,
+    sku: variant?.sku ?? undefined,
+    price,
+    compareAtPrice,
+    stock: variant?.inventory_quantity ?? 999,
+    stockUnit: 'unit',
+    minimumOrderQuantity: 1,
+    images,
+    isActive: p.status === 'published',
+    isFeatured: false,
+    vendorId: '',
+    vendorName: '',
+    categoryId: category?.id,
+    categoryName: category?.name,
+    categorySlug: category?.handle ?? undefined,
+    variants: variants?.length ? variants : undefined,
+    condition: 'new',
+    createdAt: p.created_at ?? '',
+    updatedAt: p.updated_at ?? '',
+  };
+}
+
+function toPaginatedResponse(
+  products: HttpTypes.StoreProduct[],
+  count: number,
+  offset: number,
+  limit: number,
+): PaginatedResponse<ProductEntity> {
+  return {
+    data: products.map(toProductEntity),
+    meta: {
+      total: count,
+      page: Math.floor(offset / limit) + 1,
+      limit,
+      lastPage: Math.ceil(count / limit),
+    },
+  };
+}
+
+// ── Sort helper ───────────────────────────────────────────────────────────────
+
+function toMedusaOrder(sortBy?: ProductFilters['sortBy']): string | undefined {
+  switch (sortBy) {
+    case 'newest':    return '-created_at';
+    case 'price_asc': return '+variants.calculated_price.calculated_amount';
+    case 'price_desc':return '-variants.calculated_price.calculated_amount';
+    default:          return undefined;
+  }
+}
+
+// ── API functions ─────────────────────────────────────────────────────────────
+
+async function getRegionId(): Promise<string | undefined> {
+  const { regions } = await sdk.store.region.list();
+  return regions?.[0]?.id;
+}
+
 export async function fetchProducts(
   filters: ProductFilters = {},
 ): Promise<PaginatedResponse<ProductEntity>> {
-  const { data } = await api.get<PaginatedResponse<ProductEntity>>(BASE, {
-    params: filters,
-  });
-  return data;
+  const limit  = filters.limit ?? 20;
+  const page   = filters.page  ?? 1;
+  const offset = (page - 1) * limit;
+
+  const regionId = await getRegionId();
+
+  const params: Record<string, unknown> = { fields: FIELDS, limit, offset };
+  if (regionId)           params.region_id   = regionId;
+  if (filters.search)     params.q           = filters.search;
+  if (filters.categoryId) params.category_id = [filters.categoryId];
+  const order = toMedusaOrder(filters.sortBy);
+  if (order) params.order = order;
+
+  const { products, count } = await sdk.store.product.list(params);
+
+  // Only show products attached to at least one category
+  const categorised = filters.categoryId
+    ? products
+    : products.filter((p) => p.categories && p.categories.length > 0);
+
+  return toPaginatedResponse(categorised, count ?? 0, offset, limit);
 }
 
-/**
- * Fetch a single product by slug.
- *
- * FLUTTER EQUIV:
- *   Future<Product> getProductBySlug(String slug)
- */
 export async function fetchProductBySlug(slug: string): Promise<ProductEntity> {
-  const { data } = await api.get<ProductEntity>(`${BASE}/${slug}`);
-  return data;
+  const regionId = await getRegionId();
+
+  const params: Record<string, unknown> = { fields: FIELDS, handle: slug, limit: 1 };
+  if (regionId) params.region_id = regionId;
+
+  const { products } = await sdk.store.product.list(params);
+
+  if (!products.length) throw new Error(`Product not found: ${slug}`);
+  return toProductEntity(products[0]);
 }
 
-/**
- * Fetch featured/homepage products.
- *
- * FLUTTER EQUIV:
- *   Future<List<Product>> getFeaturedProducts({int limit = 8})
- */
 export async function fetchFeaturedProducts(limit = 8): Promise<ProductEntity[]> {
-  const { data } = await api.get<PaginatedResponse<ProductEntity>>(BASE, {
-    params: { featured: true, limit },
-  });
-  return data.data;
+  const regionId = await getRegionId();
+  const params: Record<string, unknown> = { fields: FIELDS, limit };
+  if (regionId) params.region_id = regionId;
+
+  const { products } = await sdk.store.product.list(params);
+  return products.map(toProductEntity);
 }
 
-/**
- * Fetch products by category slug.
- */
 export async function fetchProductsByCategory(
   categorySlug: string,
   filters: ProductFilters = {},
 ): Promise<PaginatedResponse<ProductEntity>> {
-  const { data } = await api.get<PaginatedResponse<ProductEntity>>(BASE, {
-    params: { categorySlug, ...filters },
-  });
-  return data;
+  // Step 1: resolve category handle → ID
+  const { product_categories } = await sdk.store.category.list({ handle: categorySlug, limit: 1 });
+  if (!product_categories.length) {
+    return { data: [], meta: { total: 0, page: 1, limit: filters.limit ?? 20, lastPage: 0 } };
+  }
+
+  // Step 2: fetch products filtered by that category ID
+  return fetchProducts({ ...filters, categoryId: product_categories[0].id });
 }
