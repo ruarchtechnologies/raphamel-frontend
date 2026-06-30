@@ -1,0 +1,2 @@
+﻿src/__tests__/e2e/helpers/mock-routes.ts(286,7): error TS2353: Object literal may only specify known properties, and 'maxAge' does not exist in type '{ name: string; value: string; url?: string | undefined; domain?: string | undefined; path?: string | undefined; expires?: number | undefined; httpOnly?: boolean | undefined; secure?: boolean | undefined; sameSite?: "Strict" | ... 2 more ... | undefined; partitionKey?: string | undefined; }'.
+src/__tests__/unit/data/cart.api.test.ts(106,12): error TS18048: 'cart.items' is possibly 'undefined'.

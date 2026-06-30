@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
 import {
-  Phone, Mail, Building2, CheckCircle2, Clock, XCircle, FileText,
+  Phone, Mail, Building2, CheckCircle2, Clock, XCircle, FileText, CreditCard,
 } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -316,7 +316,10 @@ export default function AccountProfilePage() {
               {me.email}
             </div>
             <p className="mt-1 text-xs text-gray-400">
-              Email changes require identity verification — contact support.
+              Email changes require identity verification — contact{' '}
+              <a href="mailto:support@raphamel.com" className="underline" style={{ color: 'var(--color-primary)' }}>
+                support@raphamel.com
+              </a>
             </p>
           </div>
 
@@ -349,11 +352,20 @@ export default function AccountProfilePage() {
               : undefined
             }
           />
+          <InfoRow
+            icon={CreditCard}
+            label="Payment window"
+            value={
+              me.creditTerm === '30' ? 'Less than 30 days'
+              : me.creditTerm === '60' ? 'Less than 60 days'
+              : undefined
+            }
+          />
           {me.cacDocUrl && (
-            <InfoRow icon={FileText} label="Verification document" value="CAC Certificate — On file" />
+            <InfoRow icon={FileText} label="Verification document" value="CAC Certificate" />
           )}
           {me.licenceDocUrl && (
-            <InfoRow icon={FileText} label="Verification document" value="Operating Licence — On file" />
+            <InfoRow icon={FileText} label="Verification document" value="Operating Licence" />
           )}
           {!me.cacDocUrl && !me.licenceDocUrl && (
             <InfoRow icon={FileText} label="Verification document" value="None on file" />

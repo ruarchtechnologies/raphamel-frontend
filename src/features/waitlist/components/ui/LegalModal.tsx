@@ -178,7 +178,7 @@ function DocSection({ section, index }: { section: Section; index: number }) {
         {index + 1}. {section.title}
       </h3>
       {Array.isArray(section.content) ? (
-        <ul style={{ margin: 0, padding: 0, paddingLeft: '22px' }}>
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderLeft: '2px solid rgba(255,255,255,0.1)', paddingLeft: '16px' }}>
           {section.content.map((item, i) => (
             <li key={i} style={{
               fontFamily: SANS,

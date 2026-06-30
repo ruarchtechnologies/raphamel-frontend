@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -555,6 +556,7 @@ function SuccessConfirmation() {
 
 export function EarlyAccessSection() {
   const [submitted, setSubmitted] = useState(false);
+  const [panelUnoptimized, setPanelUnoptimized] = useState(false);
 
   return (
     <section
@@ -595,10 +597,14 @@ export function EarlyAccessSection() {
             className="ea-img-col"
             style={{ borderRadius: '24px', overflow: 'hidden', height: '460px', alignSelf: 'flex-start', position: 'sticky', top: '40px' }}
           >
-            <img
+            <Image
               src="/images/early-access-left.png"
               alt=""
-              style={{ width: '100%', height: '560px', objectFit: 'cover', objectPosition: '75% center', display: 'block' }}
+              fill
+              sizes="(max-width: 1024px) 0px, 52vw"
+              style={{ objectFit: 'cover', objectPosition: '75% center' }}
+              unoptimized={panelUnoptimized}
+              onError={() => setPanelUnoptimized(true)}
             />
           </div>
 

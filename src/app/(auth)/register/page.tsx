@@ -364,6 +364,7 @@ export default function RegisterPage() {
   const [cacDoc, setCacDoc] = useState<File | null>(null);
   const [licenceDoc, setLicenceDoc] = useState<File | null>(null);
   const [step1Data, setStep1Data] = useState<Step1Data | null>(null);
+  const [creditTerm, setCreditTerm] = useState<'30' | '60'>('30');
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -459,6 +460,7 @@ export default function RegisterPage() {
         password: step1Data.password,
         phone: step1Data.phone,
         facilityType: facility,
+        creditTerm: facility === 'hospital' ? creditTerm : undefined,
         cacDocUrl,
         licenceDocUrl,
       },
@@ -682,6 +684,57 @@ export default function RegisterPage() {
                         ))}
                       </div>
                     </div>
+
+                    <AnimatePresence>
+                      {facility === 'hospital' && (
+                        <motion.div
+                          key="credit-terms"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.25, ease: 'easeInOut' }}
+                          className="overflow-hidden"
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 mb-1">Payment terms</p>
+                            <p className="text-xs text-gray-400 mb-3">
+                              Your preferred timeline to settle invoices after delivery.
+                            </p>
+                            <div className="flex flex-col gap-2.5">
+                              {([
+                                { value: '30' as const, label: 'Less than 30 days', desc: 'Payment due within 30 days of delivery' },
+                                { value: '60' as const, label: 'Less than 60 days', desc: 'Payment due within 60 days of delivery' },
+                              ]).map(({ value, label, desc }) => (
+                                <button
+                                  key={value}
+                                  type="button"
+                                  onClick={() => setCreditTerm(value)}
+                                  className={cn(
+                                    'flex items-center gap-3 px-4 py-3 rounded-[8px] border-2 text-left transition-all',
+                                    creditTerm === value ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300',
+                                  )}
+                                >
+                                  <div className={cn(
+                                    'w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors',
+                                    creditTerm === value ? 'border-blue-600' : 'border-gray-300',
+                                  )}>
+                                    {creditTerm === value && (
+                                      <div className="w-2 h-2 rounded-full bg-blue-600" />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className={cn('text-sm font-semibold', creditTerm === value ? 'text-blue-700' : 'text-gray-800')}>
+                                      {label}
+                                    </p>
+                                    <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     <div className="space-y-4">
                       <div>

@@ -4,18 +4,12 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { ProductGrid } from '@/components/products/ProductGrid';
-import { useFeaturedProducts } from '@/features/catalog/hooks/useProducts';
+import { useFeaturedProducts, useProductsByCategory } from '@/features/catalog/hooks/useProducts';
+import { useCategories } from '@/features/categories/hooks/useCategories';
 import type { ProductCardData } from '@/components/products/ProductCard';
 import type { ProductEntity } from '@/domain/entities/product.entity';
+import type { CategoryEntity } from '@/domain/entities/category.entity';
 import { cn } from '@/lib/utils';
-
-const TABS = [
-  { label: 'Featured',     key: 'featured' },
-  { label: 'New Arrivals', key: 'new'      },
-  { label: 'On Sale',      key: 'sale'     },
-] as const;
-
-type TabKey = (typeof TABS)[number]['key'];
 
 function toCardData(p: ProductEntity): ProductCardData {
   return {
@@ -32,28 +26,19 @@ function toCardData(p: ProductEntity): ProductCardData {
   };
 }
 
-function filterProducts(tab: TabKey, products: ProductCardData[], raw: ProductEntity[]): ProductCardData[] {
-  switch (tab) {
-    case 'new':
-      // newest first (raw has createdAt)
-      return [...products].sort((a, b) => {
-        const ra = raw.find((p) => p.id === a.id);
-        const rb = raw.find((p) => p.id === b.id);
-        return new Date(rb?.createdAt ?? 0).getTime() - new Date(ra?.createdAt ?? 0).getTime();
-      });
-    case 'sale':
-      return products.filter((p) => p.compareAtPrice && p.compareAtPrice > p.price);
-    default:
-      return products;
-  }
-}
-
 export function FeaturedProducts() {
-  const [activeTab, setActiveTab] = useState<TabKey>('featured');
-  const { data: products, isLoading } = useFeaturedProducts(8);
+  const [activeCategory, setActiveCategory] = useState<CategoryEntity | null>(null);
 
-  const cards = (products ?? []).map(toCardData);
-  const filtered = filterProducts(activeTab, cards, products ?? []);
+  const { data: categories, isLoading: catsLoading } = useCategories();
+  const { data: featured, isLoading: featuredLoading } = useFeaturedProducts(8);
+  const { data: catResult, isLoading: catLoading } = useProductsByCategory(
+    activeCategory?.slug ?? '',
+    { limit: 8 },
+  );
+
+  const isLoading = activeCategory ? catLoading : featuredLoading;
+  const raw: ProductEntity[] = activeCategory ? (catResult?.data ?? []) : (featured ?? []);
+  const cards = raw.map(toCardData);
 
   return (
     <section className="section bg-gray-50">
@@ -71,27 +56,48 @@ export function FeaturedProducts() {
           </Link>
         </div>
 
-        {/* Tab bar */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={cn(
-                'flex-shrink-0 h-9 px-4 text-sm font-semibold rounded-full transition-all',
-                activeTab === tab.key
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-primary hover:text-primary',
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Category chips */}
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
+          {catsLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex-shrink-0 h-9 w-24 rounded-full bg-gray-200 animate-pulse" />
+            ))
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setActiveCategory(null)}
+                className={cn(
+                  'flex-shrink-0 h-9 px-4 text-sm font-semibold rounded-full transition-all',
+                  activeCategory === null
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:border-primary hover:text-primary',
+                )}
+              >
+                All
+              </button>
+              {(categories ?? []).map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setActiveCategory(cat)}
+                  className={cn(
+                    'flex-shrink-0 h-9 px-4 text-sm font-semibold rounded-full transition-all',
+                    activeCategory?.id === cat.id
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-primary hover:text-primary',
+                  )}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </>
+          )}
         </div>
 
         <ProductGrid
-          products={filtered}
-          total={filtered.length}
+          products={cards}
+          total={cards.length}
           columns={4}
           showToolbar={false}
           loading={isLoading}
