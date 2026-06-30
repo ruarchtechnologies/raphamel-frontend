@@ -35,16 +35,16 @@ function toCardData(p: ProductEntity): ProductCardData {
 const CATEGORY_OPTIONS = ['All', ...HEALTH_CATEGORIES.map((c) => c.name)];
 
 const PRICE_RANGES = [
-  { label: 'Under ₦10,000',         min: 0,         max: 10_000   },
-  { label: '₦10,000 – ₦50,000',     min: 10_000,    max: 50_000   },
-  { label: '₦50,000 – ₦200,000',    min: 50_000,    max: 200_000  },
-  { label: '₦200,000 – ₦1,000,000', min: 200_000,   max: 1_000_000 },
-  { label: 'Over ₦1,000,000',        min: 1_000_000, max: Infinity },
+  { label: 'Under ₦10,000', min: 0, max: 10_000 },
+  { label: '₦10,000 – ₦50,000', min: 10_000, max: 50_000 },
+  { label: '₦50,000 – ₦200,000', min: 50_000, max: 200_000 },
+  { label: '₦200,000 – ₦1,000,000', min: 200_000, max: 1_000_000 },
+  { label: 'Over ₦1,000,000', min: 1_000_000, max: Infinity },
 ];
 
 const SORT_OPTIONS: { label: string; value: ProductFilters['sortBy'] }[] = [
-  { label: 'Newest',        value: 'newest'     },
-  { label: 'Price: Low–High', value: 'price_asc'  },
+  { label: 'Newest', value: 'newest' },
+  { label: 'Price: Low–High', value: 'price_asc' },
   { label: 'Price: High–Low', value: 'price_desc' },
 ];
 
@@ -140,16 +140,16 @@ function FilterPanel({ selectedCat, selectedPrice, onCat, onPrice, onReset, onCl
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ProductsPage() {
-  const [filterOpen, setFilterOpen]     = useState(false);
-  const [selectedCat, setSelectedCat]   = useState('All');
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedCat, setSelectedCat] = useState('All');
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
-  const [sortBy, setSortBy]             = useState<ProductFilters['sortBy']>('newest');
+  const [sortBy, setSortBy] = useState<ProductFilters['sortBy']>('newest');
 
   const filters: ProductFilters = { sortBy };
 
   const { data: page, isLoading, isError } = useProducts(filters);
   const products = (page?.data ?? []).map(toCardData);
-  const total    = page?.meta.total ?? 0;
+  const total = page?.meta.total ?? 0;
 
   // Client-side price filter (server doesn't support range yet)
   const priceRange = PRICE_RANGES.find((r) => r.label === selectedPrice);
@@ -172,7 +172,7 @@ export default function ProductsPage() {
           <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Products' }]} />
           <h1 className="text-2xl font-bold text-gray-900 mt-2">All Medical Products</h1>
           <p className="text-gray-500 text-sm mt-1">
-            {isLoading ? 'Loading products…' : `${total.toLocaleString()} NAFDAC-verified medical products`}
+            {isLoading ? 'Loading products…' : `${total.toLocaleString()}`}
           </p>
         </div>
       </div>

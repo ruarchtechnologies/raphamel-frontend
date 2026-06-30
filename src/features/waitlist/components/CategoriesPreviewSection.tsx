@@ -1,9 +1,27 @@
 'use client';
 
+import Image from 'next/image';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { SANS } from '../fonts';
 import { HEALTH_CATEGORIES } from '@/domain/entities/category.entity';
 import './waitlistHero.css';
+
+function TileImage({ src, alt, pos }: { src: string; alt: string; pos?: string }) {
+  const [unoptimized, setUnoptimized] = useState(false);
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+      style={{ objectPosition: pos ?? 'center' }}
+      draggable={false}
+      unoptimized={unoptimized}
+      onError={() => setUnoptimized(true)}
+    />
+  );
+}
 
 const TILES: { slug: string; cls: string; pos?: string }[] = [
   { slug: 'hospital-consumables', cls: 'cat-a', pos: 'center' },
@@ -12,11 +30,9 @@ const TILES: { slug: string; cls: string; pos?: string }[] = [
   { slug: 'personal-protective-equipment', cls: 'cat-d', pos: 'center' },
   { slug: 'rehabilitation-equipment', cls: 'cat-e', pos: 'center' },
   { slug: 'laboratory-supplies', cls: 'cat-f', pos: 'center' },
-  { slug: 'pharmaceuticals', cls: 'cat-g', pos: 'center' },
   { slug: 'patient-care-products', cls: 'cat-h', pos: 'center' },
   { slug: 'imaging-monitoring-equipment', cls: 'cat-i', pos: 'center' },
   { slug: 'mobility-orthopaedic-aids', cls: 'cat-j', pos: 'center' },
-  { slug: 'topicals', cls: 'cat-k', pos: 'center' },
 ];
 
 export function CategoriesPreviewSection() {
@@ -77,11 +93,10 @@ export function CategoriesPreviewSection() {
                 transition={{ duration: 0.55, delay: Math.min(i * 0.055, 0.38) }}
               >
                 {/* Full-bleed image — no overlay */}
-                <img
+                <TileImage
                   src={`/images/category-${tile.slug}.png`}
                   alt={cat.name}
-                  style={{ objectPosition: tile.pos ?? 'center' }}
-                  draggable={false}
+                  pos={tile.pos}
                 />
 
                 {/* Name chip */}

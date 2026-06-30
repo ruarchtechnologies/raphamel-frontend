@@ -10,7 +10,7 @@ export function StatsBand() {
 
     return (
         <section ref={statsRef.ref} className="py-16" style={{ background: '#060E1C' }}>
-            <div className="max-w-7xl mx-auto px-6">
+            <div style={{ paddingLeft: "1.5rem", paddingRight: "1.5rem" }}>
                 <div className="flex flex-row justify-center gap-12 md:gap-20">
                     {STATS.map((stat, i) => (
                         <motion.div

@@ -13,6 +13,7 @@ export interface RegisterPayload {
   password: string;
   phone?: string;
   facilityType?: string;
+  creditTerm?: '30' | '60';
   cacDocUrl?: string;
   licenceDocUrl?: string;
 }
@@ -35,6 +36,7 @@ export interface AuthUser {
   verificationStatus: 'not_submitted' | 'pending' | 'approved' | 'rejected';
   rejectionNotes?: string;
   facilityType?: string;
+  creditTerm?: '30' | '60';
   cacDocUrl?: string;
   licenceDocUrl?: string;
   defaultAddress?: AuthUserAddress;
@@ -67,6 +69,7 @@ function toAuthUser(customer: HttpTypes.StoreCustomer): AuthUser {
     verificationStatus: (meta.verification_status as AuthUser['verificationStatus']) ?? 'not_submitted',
     rejectionNotes: meta.rejection_notes ?? undefined,
     facilityType: meta.facility_type ?? undefined,
+    creditTerm: (meta.credit_term as '30' | '60') ?? undefined,
     cacDocUrl: meta.cac_doc_url ?? undefined,
     licenceDocUrl: meta.licence_doc_url ?? undefined,
     defaultAddress: addr ? {
@@ -109,6 +112,7 @@ export async function register(payload: RegisterPayload): Promise<AuthResult> {
     phone: payload.phone,
     metadata: {
       facility_type: payload.facilityType ?? null,
+      credit_term: payload.creditTerm ?? null,
       cac_doc_url: payload.cacDocUrl ?? null,
       licence_doc_url: payload.licenceDocUrl ?? null,
       verification_status: 'pending',

@@ -15,7 +15,7 @@ export function Footer() {
         className="py-8"
         style={{ background: '#060E1C', borderTop: '1px solid rgba(255,255,255,0.08)' }}
       >
-        <div className="max-w-7xl mx-auto px-6">
+        <div style={{ paddingLeft: "1.5rem", paddingRight: "1.5rem" }}>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Logo */}
             <div className="flex items-center gap-0.5">
@@ -48,7 +48,7 @@ export function Footer() {
                 Terms of Service
               </button>
               <a
-                href="mailto:raphamel.tech@gmail.com"
+                href="mailto:support@raphamel.com"
                 className="text-sm transition-colors hover:text-white"
                 style={{ fontFamily: SANS, color: '#64748B' }}
               >

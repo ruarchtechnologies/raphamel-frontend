@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import { useState } from 'react';
 import './waitlistHero.css';
 import { MONO, SANS } from '../fonts';
 
@@ -8,6 +10,8 @@ import { MONO, SANS } from '../fonts';
 const barHeights = [40, 65, 55, 80, 70, 90, 75];
 
 export function WaitlistHeroSection() {
+  const [logoUnoptimized, setLogoUnoptimized] = useState(false);
+  const [productUnoptimized, setProductUnoptimized] = useState(false);
 
   return (
     <section className="hero-root">
@@ -18,7 +22,7 @@ export function WaitlistHeroSection() {
       {/* NAV ROW — full width, top of hero */}
       <div className="hero-nav">
         <Link href="/" className="flex items-center rounded-full" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)', padding: '6px 24px 6px 4px', gap: '2px' }}>
-          <img src="/images/logo.png" alt="Raphamel" className="h-16 w-auto" />
+          <Image src="/images/logo.png" alt="Raphamel" width={200} height={64} priority className="h-16 w-auto" unoptimized={logoUnoptimized} onError={() => setLogoUnoptimized(true)} />
           <span className="font-bold text-white text-3xl pl-1" style={{ fontFamily: SANS }}>Raphamel</span>
         </Link>
       </div>
@@ -72,10 +76,14 @@ export function WaitlistHeroSection() {
               </div>
 
               <div className="product-row">
-                <img
-                  className="product-img"
+                <Image
                   src="/images/iv_fluid_test.jpg"
                   alt="IV Fluid"
+                  width={64}
+                  height={64}
+                  className="product-img"
+                  unoptimized={productUnoptimized}
+                  onError={() => setProductUnoptimized(true)}
                 />
                 <div className="product-info">
                   <div className="product-name">IV Fluid Set – 1000ml</div>

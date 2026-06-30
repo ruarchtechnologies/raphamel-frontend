@@ -28,6 +28,25 @@ import { ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
+function SecondaryCtaButton({ href, label, accent }: { href: string; label: string; accent: string }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <Link
+      href={href}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="inline-flex items-center h-12 px-6 text-sm font-semibold rounded-[6px] border transition-all duration-200"
+      style={{
+        borderColor: hovered ? accent : 'rgba(255,255,255,0.2)',
+        backgroundColor: hovered ? `${accent}22` : 'transparent',
+        color: hovered ? accent : 'white',
+      }}
+    >
+      {label}
+    </Link>
+  );
+}
+
 // ── Slide data — healthcare B2B content ──────────────────────────────────────
 //
 // IMAGE NEEDED (slide 1): hero-hospital-consumables.jpg | Size: 700x500
@@ -200,33 +219,18 @@ export function HeroBanner() {
                            */}
                           <Link
                             href={slide.cta.href}
-                            className="inline-flex items-center h-12 px-6 text-sm font-bold rounded-[6px] text-gray-900 transition-transform hover:scale-105"
-                            style={{ backgroundColor: slide.accent }}
+                            className="inline-flex items-center h-12 px-6 text-sm font-bold rounded-[6px] transition-transform hover:scale-105"
+                            style={{ backgroundColor: slide.accent, color: '#111827' }}
                           >
                             {slide.cta.label}
                           </Link>
-                          <Link
+                          <SecondaryCtaButton
                             href={slide.secondaryCta.href}
-                            className="inline-flex items-center h-12 px-6 text-sm font-semibold rounded-[6px] border border-white/20 text-white hover:bg-white/10 transition-colors"
-                          >
-                            {slide.secondaryCta.label}
-                          </Link>
+                            label={slide.secondaryCta.label}
+                            accent={slide.accent}
+                          />
                         </motion.div>
 
-                        {/* Stats row */}
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.55 }}
-                          className="flex gap-8 mt-10"
-                        >
-                          {slide.stats.map((s) => (
-                            <div key={s.label}>
-                              <p className="text-2xl font-bold text-white">{s.value}</p>
-                              <p className="text-xs text-gray-400 font-medium">{s.label}</p>
-                            </div>
-                          ))}
-                        </motion.div>
                       </>
                     )}
                   </div>

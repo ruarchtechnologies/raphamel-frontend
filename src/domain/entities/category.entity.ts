@@ -113,16 +113,6 @@ export const HEALTH_CATEGORIES: readonly CategoryEntity[] = [
     productCount: 1560,
   },
   {
-    id: 'cat-08',
-    name: 'Pharmaceuticals',
-    slug: 'pharmaceuticals',
-    color: '#ffedd5',
-    description:
-      'Prescription drugs, OTC medications, antibiotics, vaccines, IV fluids and essential medicines for clinical and hospital use.',
-    image: '/images/category-pharmaceuticals.png',
-    productCount: 730,
-  },
-  {
     id: 'cat-09',
     name: 'Mobility & Orthopaedic Aids',
     slug: 'mobility-orthopaedic-aids',
@@ -131,16 +121,6 @@ export const HEALTH_CATEGORIES: readonly CategoryEntity[] = [
       'Wheelchairs, crutches, walkers, orthotic braces, compression stockings and mobility aids.',
     image: '/images/category-mobility-orthopaedic-aids.png',
     productCount: 940,
-  },
-  {
-    id: 'cat-10',
-    name: 'Topicals',
-    slug: 'topicals',
-    color: '#dcfce7',
-    description:
-      'Antiseptic creams, wound ointments, medicated lotions, dermatological preparations and topical anaesthetics.',
-    image: '/images/category-topicals.png',
-    productCount: 890,
   },
   {
     id: 'cat-11',

@@ -56,14 +56,11 @@ const NAV_LINKS = [
       { label: 'Rehabilitation Equipment', href: '/categories/rehabilitation-equipment' },
       { label: 'Laboratory Supplies', href: '/categories/laboratory-supplies' },
       { label: 'Patient Care Products', href: '/categories/patient-care-products' },
-      { label: 'Pharmaceuticals', href: '/categories/pharmaceuticals' },
-      { label: 'Topicals', href: '/categories/topicals' },
       { label: 'Mobility & Orthopaedic', href: '/categories/mobility-orthopaedic-aids' },
       { label: 'Imaging & Monitoring', href: '/categories/imaging-monitoring-equipment' },
     ],
   },
   // { label: 'Suppliers', href: '/vendors' }, // DISABLED: vendor/supplier feature removed
-  { label: 'Deals', href: '/products?sort=sale' },
 ] as const;
 
 // ── NavLink sub-component ─────────────────────────────────────────────────────
