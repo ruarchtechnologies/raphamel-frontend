@@ -3,9 +3,14 @@ import type { PaginatedResponse, ProductFilters } from '@/types/index';
 import type { ProductEntity } from '@/domain/entities/product.entity';
 import type { HttpTypes } from '@medusajs/types';
 
-// Request these extra fields on every product query.
-// Without "+variants.calculated_price" the price comes back undefined.
-const FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*variants.options,*options,*images,*categories';
+// Fields for product list endpoints (homepage, search, category pages).
+// Lean on purpose — options expansion is not needed for cards and can
+// conflict with Medusa's category_id filter, returning zero results.
+const LIST_FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images,*categories';
+
+// Fields for the single product detail page only.
+// Includes variant options so the per-option selector UI can render.
+const DETAIL_FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*variants.options,*options,*images,*categories';
 
 // ── Mapper ────────────────────────────────────────────────────────────────────
 
@@ -126,7 +131,7 @@ export async function fetchProducts(
 
   const regionId = await getRegionId();
 
-  const params: Record<string, unknown> = { fields: FIELDS, limit, offset };
+  const params: Record<string, unknown> = { fields: LIST_FIELDS, limit, offset };
   if (regionId)           params.region_id   = regionId;
   if (filters.search)     params.q           = filters.search;
   if (filters.categoryId) params.category_id = [filters.categoryId];
@@ -146,7 +151,7 @@ export async function fetchProducts(
 export async function fetchProductBySlug(slug: string): Promise<ProductEntity> {
   const regionId = await getRegionId();
 
-  const params: Record<string, unknown> = { fields: FIELDS, handle: slug, limit: 1 };
+  const params: Record<string, unknown> = { fields: DETAIL_FIELDS, handle: slug, limit: 1 };
   if (regionId) params.region_id = regionId;
 
   const { products } = await sdk.store.product.list(params);
@@ -157,7 +162,7 @@ export async function fetchProductBySlug(slug: string): Promise<ProductEntity> {
 
 export async function fetchFeaturedProducts(limit = 8): Promise<ProductEntity[]> {
   const regionId = await getRegionId();
-  const params: Record<string, unknown> = { fields: FIELDS, limit };
+  const params: Record<string, unknown> = { fields: LIST_FIELDS, limit };
   if (regionId) params.region_id = regionId;
 
   const { products } = await sdk.store.product.list(params);

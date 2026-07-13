@@ -75,7 +75,10 @@ export function CartSidebar() {
       ) : (
         <ul className="divide-y divide-gray-100">
           {items.map((item) => {
-            const image    = item.thumbnail ?? '/images/product-placeholder.png';
+            const rawThumb = item.thumbnail ?? '';
+            const image    = rawThumb.startsWith('http://localhost') || !rawThumb
+              ? '/images/product-placeholder.png'
+              : rawThumb;
             const handle   = (item as { variant?: { product?: { handle?: string } } }).variant?.product?.handle ?? '#';
             const varTitle = (item as { subtitle?: string }).subtitle;
 

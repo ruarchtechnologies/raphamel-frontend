@@ -32,7 +32,8 @@ export function useAddToCart() {
 
   return useMutation({
     mutationFn: async ({ variantId, quantity }: { variantId: string; quantity: number }) => {
-      const cart = await getOrCreateCart();
+      const cached = queryClient.getQueryData<Awaited<ReturnType<typeof getOrCreateCart>>>(cartKeys.cart);
+      const cart = cached ?? await getOrCreateCart();
       return addLineItem(cart.id, variantId, quantity);
     },
     onSuccess: (updatedCart) => {

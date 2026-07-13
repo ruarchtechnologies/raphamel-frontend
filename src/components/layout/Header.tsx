@@ -24,6 +24,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   Menu, Heart, ShoppingBag, User, ChevronDown, Search,
 } from 'lucide-react';
@@ -128,6 +129,7 @@ export function Header() {
   const { setCartOpen, setMenuOpen } = useUIStore();
   const itemCount = useCartItemCount();
   const { data: me, isLoading: authLoading } = useMe();
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
@@ -268,7 +270,7 @@ export function Header() {
               ) : (
                 <>
                   <Link
-                    href="/login"
+                    href={`/login?returnTo=${encodeURIComponent(pathname)}`}
                     className="text-gray-600 hover:text-primary font-medium transition-colors"
                   >
                     Sign in

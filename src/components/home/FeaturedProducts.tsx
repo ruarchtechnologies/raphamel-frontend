@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { ProductGrid } from '@/components/products/ProductGrid';
-import { useFeaturedProducts, useProductsByCategory } from '@/features/catalog/hooks/useProducts';
+import { useFeaturedProducts, useProductsByCategoryId } from '@/features/catalog/hooks/useProducts';
 import { useCategories } from '@/features/categories/hooks/useCategories';
 import type { ProductCardData } from '@/components/products/ProductCard';
 import type { ProductEntity } from '@/domain/entities/product.entity';
@@ -31,8 +31,8 @@ export function FeaturedProducts() {
 
   const { data: categories, isLoading: catsLoading } = useCategories();
   const { data: featured, isLoading: featuredLoading } = useFeaturedProducts(8);
-  const { data: catResult, isLoading: catLoading } = useProductsByCategory(
-    activeCategory?.slug ?? '',
+  const { data: catResult, isLoading: catLoading } = useProductsByCategoryId(
+    activeCategory?.id ?? '',
     { limit: 8 },
   );
 

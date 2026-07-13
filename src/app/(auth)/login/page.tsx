@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Clock, XCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,11 +30,13 @@ function getViewForUser(user: AuthUser): View | 'home' {
   return 'pending';
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [showPass, setShowPass]   = useState(false);
   const [view, setView]           = useState<View>('form');
   const [rejectedUser, setRejectedUser] = useState<AuthUser | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo') ?? '/';
 
   const { data: me, isLoading: meLoading } = useMe();
   const { mutate: signIn, isPending } = useLogin();
@@ -48,7 +50,7 @@ export default function LoginPage() {
     if (meLoading || !me) return;
     const destination = getViewForUser(me);
     if (destination === 'home') {
-      router.replace('/account');
+      router.replace(returnTo);
     } else if (destination === 'rejected') {
       setRejectedUser(me);
       setView('rejected');
@@ -64,7 +66,7 @@ export default function LoginPage() {
         onSuccess: ({ user }) => {
           const destination = getViewForUser(user);
           if (destination === 'home') {
-            router.push('/account');
+            router.push(returnTo);
           } else if (destination === 'rejected') {
             setRejectedUser(user);
             setView('rejected');
@@ -253,5 +255,13 @@ export default function LoginPage() {
         </footer>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
   );
 }

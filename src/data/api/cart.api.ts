@@ -109,9 +109,11 @@ export interface PaymentSessionResult {
 }
 
 export async function initializePaymentSession(cartId: string): Promise<PaymentSessionResult> {
-  const { payment_providers } = await sdk.store.payment.listPaymentProviders({
-    region_id: REGION_ID!,
-  });
+  // listPaymentProviders and cart.retrieve are independent — run them in parallel.
+  const [{ payment_providers }, { cart }] = await Promise.all([
+    sdk.store.payment.listPaymentProviders({ region_id: REGION_ID! }),
+    sdk.store.cart.retrieve(cartId),
+  ]);
 
   // Prefer a Paystack provider if installed; fall back to system default; then any available
   const providerId =
@@ -126,7 +128,6 @@ export async function initializePaymentSession(cartId: string): Promise<PaymentS
     );
   }
 
-  const { cart } = await sdk.store.cart.retrieve(cartId);
   const result = await sdk.store.payment.initiatePaymentSession(cart, { provider_id: providerId });
 
   // The Paystack plugin stores access_code + authorization_url in session.data

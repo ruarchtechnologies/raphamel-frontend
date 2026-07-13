@@ -54,6 +54,8 @@ export const productKeys = {
   featured: (limit: number) => [...productKeys.all, 'featured', limit] as const,
   byCategory: (slug: string, filters: ProductFilters) =>
     [...productKeys.all, 'category', slug, filters] as const,
+  byCategoryId: (id: string, filters: ProductFilters) =>
+    [...productKeys.all, 'categoryId', id, filters] as const,
   details: () => [...productKeys.all, 'detail'] as const,
   detail: (slug: string) => [...productKeys.details(), slug] as const,
   search: (query: string) => [...productKeys.all, 'search', query] as const,
@@ -129,7 +131,24 @@ export function useProductsByCategory(
   return useQuery({
     queryKey: productKeys.byCategory(categorySlug, filters),
     queryFn: () => fetchProductsByCategory(categorySlug, filters),
-    enabled: Boolean(categorySlug), // FLUTTER EQUIV: only call if slug is non-null
+    enabled: Boolean(categorySlug),
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+/**
+ * Fetch products by category ID — skips the slug→ID resolution call.
+ * Use this when you already have the category ID (e.g. from useCategories()).
+ * Saves one full round-trip to the backend compared to useProductsByCategory.
+ */
+export function useProductsByCategoryId(
+  categoryId: string,
+  filters: ProductFilters = {},
+) {
+  return useQuery({
+    queryKey: productKeys.byCategoryId(categoryId, filters),
+    queryFn: () => fetchProducts({ ...filters, categoryId }),
+    enabled: Boolean(categoryId),
     staleTime: 1000 * 60 * 5,
   });
 }

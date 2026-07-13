@@ -18,17 +18,26 @@ import { cn } from '@/lib/utils';
 
 function ProductDetailSkeleton() {
   return (
-    <div className="container py-8 animate-pulse">
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-        <div className="lg:w-[48%] flex-shrink-0">
-          <div className="aspect-[4/5] bg-gray-200 rounded-[10px]" />
+    <div className="animate-pulse">
+      {/* Breadcrumb bar placeholder — matches the real bar's height */}
+      <div className="bg-gray-50 border-b border-gray-100 py-4">
+        <div className="container">
+          <div className="h-4 bg-gray-200 rounded w-48" />
         </div>
-        <div className="flex-1 space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-3/4" />
-          <div className="h-4 bg-gray-100 rounded w-1/3" />
-          <div className="h-10 bg-gray-200 rounded w-1/2" />
-          <div className="h-12 bg-gray-200 rounded" />
-          <div className="h-12 bg-gray-100 rounded" />
+      </div>
+
+      <div className="container py-8">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          <div className="lg:w-[48%] flex-shrink-0">
+            <div className="aspect-[4/5] bg-gray-200 rounded-[10px]" />
+          </div>
+          <div className="flex-1 space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-3/4" />
+            <div className="h-4 bg-gray-100 rounded w-1/3" />
+            <div className="h-10 bg-gray-200 rounded w-1/2" />
+            <div className="h-12 bg-gray-200 rounded" />
+            <div className="h-12 bg-gray-100 rounded" />
+          </div>
         </div>
       </div>
     </div>
