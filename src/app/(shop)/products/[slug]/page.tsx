@@ -1,9 +1,9 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Heart, Share2, Truck, Shield, RefreshCcw, Minus, Plus, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, Truck, Shield, RefreshCcw, Minus, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
@@ -35,17 +35,136 @@ function ProductDetailSkeleton() {
   );
 }
 
+// ── Option selector ───────────────────────────────────────────────────────────
+
+interface OptionGroupProps {
+  title: string;
+  values: string[];
+  selected: string | undefined;
+  onSelect: (value: string) => void;
+  isValueAvailable: (value: string) => boolean;
+}
+
+function OptionGroup({ title, values, selected, onSelect, isValueAvailable }: OptionGroupProps) {
+  return (
+    <div className="mb-4">
+      <p className="text-sm font-semibold text-gray-800 mb-2">
+        {title}:{' '}
+        {selected && <span className="font-normal text-gray-600">{selected}</span>}
+      </p>
+      <div className="flex gap-2 flex-wrap">
+        {values.map((value) => {
+          const available = isValueAvailable(value);
+          const active = selected === value;
+          return (
+            <button
+              key={value}
+              onClick={() => available && onSelect(value)}
+              disabled={!available}
+              className={cn(
+                'h-9 px-4 text-sm rounded-[6px] border-2 transition-all',
+                active
+                  ? 'border-primary text-primary font-semibold bg-primary/5'
+                  : available
+                  ? 'border-gray-200 text-gray-700 hover:border-gray-400'
+                  : 'border-gray-100 text-gray-300 cursor-not-allowed line-through',
+              )}
+            >
+              {value}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const { data: product, isPending, isError } = useProductBySlug(slug);
 
-  const [mainImg, setMainImg]         = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
-  const [qty, setQty]                 = useState(1);
+  const [mainImg, setMainImg] = useState(0);
+  const [qty, setQty] = useState(1);
+
+  // selectedOptions maps each option title to its currently chosen value.
+  // Initialised lazily to the first variant's option values once product loads.
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [optionsInitialised, setOptionsInitialised] = useState(false);
 
   const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
+
+  const variants = product?.variants ?? [];
+  const options  = product?.options  ?? [];
+
+  // Pre-select the first available variant's option values on first load.
+  if (product && !optionsInitialised && variants.length > 0 && options.length > 0) {
+    const firstAvailable = variants.find((v) => v.stock > 0) ?? variants[0];
+    if (firstAvailable.optionValues && Object.keys(firstAvailable.optionValues).length > 0) {
+      setSelectedOptions(firstAvailable.optionValues);
+    }
+    setOptionsInitialised(true);
+  }
+
+  // Resolved variant: every option value must match the current selection.
+  const resolvedVariant = useMemo(() => {
+    if (options.length === 0) return variants[0] ?? null;
+    const selectionComplete = options.every((o) => selectedOptions[o.title] !== undefined);
+    if (!selectionComplete) return null;
+    return (
+      variants.find((v) =>
+        options.every((o) => v.optionValues?.[o.title] === selectedOptions[o.title]),
+      ) ?? null
+    );
+  }, [variants, options, selectedOptions]);
+
+  // Derive display price and stock from the resolved variant when available.
+  const displayPrice      = resolvedVariant?.price ?? product?.price ?? 0;
+  const displayStock      = resolvedVariant?.stock ?? product?.stock ?? 0;
+  const compareAtPrice    = product?.compareAtPrice;
+
+  const salePercent =
+    compareAtPrice && compareAtPrice > displayPrice
+      ? Math.round(((compareAtPrice - displayPrice) / compareAtPrice) * 100)
+      : null;
+
+  // For a given option group and candidate value, check whether any variant
+  // satisfies that value combined with all OTHER currently-selected options.
+  function isValueAvailable(optionTitle: string, value: string): boolean {
+    return variants.some((v) => {
+      if (v.optionValues?.[optionTitle] !== value) return false;
+      return options
+        .filter((o) => o.title !== optionTitle)
+        .every((o) => {
+          const sel = selectedOptions[o.title];
+          return sel === undefined || v.optionValues?.[o.title] === sel;
+        });
+    });
+  }
+
+  function handleSelect(optionTitle: string, value: string) {
+    setSelectedOptions((prev) => ({ ...prev, [optionTitle]: value }));
+  }
+
+  function handleAddToCart() {
+    if (!resolvedVariant?.id) {
+      const missing = options.find((o) => !selectedOptions[o.title]);
+      toast.error(missing ? `Please select a ${missing.title}` : 'This product is not available.');
+      return;
+    }
+    addToCart(
+      { variantId: resolvedVariant.id, quantity: qty },
+      {
+        onSuccess: () => {
+          toast.success('Added to cart', { description: product!.name });
+        },
+      },
+    );
+  }
+
+  // Unselected options the customer still needs to pick.
+  const missingOption = options.find((o) => !selectedOptions[o.title]);
 
   if (isPending) return <ProductDetailSkeleton />;
 
@@ -61,31 +180,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
     );
   }
 
-  const variants   = product.variants ?? [];
-  const activeVariantId = selectedVariant ?? variants[0]?.id ?? 'default';
-  const activeVariant   = variants.find((v) => v.id === activeVariantId) ?? variants[0];
-
-  const salePercent = product.compareAtPrice && product.compareAtPrice > product.price
-    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
-    : null;
-
-  function handleAddToCart() {
-    if (!activeVariant?.id) {
-      toast.error('This product is not available for purchase.');
-      return;
-    }
-    addToCart(
-      { variantId: activeVariant.id, quantity: qty },
-      {
-        onSuccess: () => {
-          toast.success('Added to cart', { description: product!.name });
-        },
-      },
-    );
-  }
-
   const images = product.images.length ? product.images : ['/images/product-placeholder.png'];
   const safeMainImg = Math.min(mainImg, images.length - 1);
+
+  const canAddToCart = Boolean(resolvedVariant) && displayStock > 0;
 
   return (
     <div className="page-enter">
@@ -170,32 +268,46 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               <p className="text-sm text-gray-400 mb-3">SKU: {product.sku}</p>
             )}
 
-            {/* Price + stock */}
+            {/* Price + stock — update live as resolved variant changes */}
             <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-gray-100 mb-5">
-              <PriceDisplay price={product.price} compareAtPrice={product.compareAtPrice} size="lg" />
-              <Badge variant={product.stock > 0 ? 'green' : 'out'}>
-                {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+              <PriceDisplay price={displayPrice} compareAtPrice={compareAtPrice} size="lg" />
+              <Badge variant={displayStock > 0 ? 'green' : 'out'}>
+                {displayStock > 0 ? 'In Stock' : 'Out of Stock'}
               </Badge>
             </div>
 
-            {/* Variants */}
-            {variants.length > 1 && (
+            {/* Per-option selector groups */}
+            {options.length > 0 && (
               <div className="mb-5">
-                <p className="text-sm font-semibold text-gray-800 mb-2">
-                  Variant: <span className="font-normal text-gray-600">{activeVariant?.name}</span>
-                </p>
+                {options.map((option) => (
+                  <OptionGroup
+                    key={option.id}
+                    title={option.title}
+                    values={option.values}
+                    selected={selectedOptions[option.title]}
+                    onSelect={(value) => handleSelect(option.title, value)}
+                    isValueAvailable={(value) => isValueAvailable(option.title, value)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Fallback: single-option products with no structured options */}
+            {options.length === 0 && variants.length > 1 && (
+              <div className="mb-5">
+                <p className="text-sm font-semibold text-gray-800 mb-2">Variant</p>
                 <div className="flex gap-2 flex-wrap">
                   {variants.map((v) => (
                     <button
                       key={v.id}
-                      onClick={() => setSelectedVariant(v.id)}
+                      onClick={() => setSelectedOptions({ _variant: v.id })}
                       disabled={v.stock === 0}
                       className={cn(
                         'h-9 px-4 text-sm rounded-[6px] border-2 transition-all',
-                        v.id === activeVariantId
+                        selectedOptions['_variant'] === v.id
                           ? 'border-primary text-primary font-semibold bg-primary/5'
                           : v.stock === 0
-                          ? 'border-gray-200 text-gray-300 cursor-not-allowed line-through'
+                          ? 'border-gray-100 text-gray-300 cursor-not-allowed line-through'
                           : 'border-gray-200 text-gray-700 hover:border-gray-400',
                       )}
                     >
@@ -232,9 +344,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 leftIcon={<ShoppingCart size={17} />}
                 onClick={handleAddToCart}
                 loading={isAddingToCart}
-                disabled={product.stock === 0 || isAddingToCart}
+                disabled={!canAddToCart || isAddingToCart}
               >
-                {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                {displayStock === 0
+                  ? 'Out of Stock'
+                  : missingOption
+                  ? `Select a ${missingOption.title}`
+                  : 'Add to Cart'}
               </Button>
 
               <Button variant="outline" size="icon" aria-label="Share">

@@ -5,7 +5,7 @@ import type { HttpTypes } from '@medusajs/types';
 
 // Request these extra fields on every product query.
 // Without "+variants.calculated_price" the price comes back undefined.
-const FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images,*categories';
+const FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*variants.options,*options,*images,*categories';
 
 // ── Mapper ────────────────────────────────────────────────────────────────────
 
@@ -26,13 +26,31 @@ function toProductEntity(p: HttpTypes.StoreProduct): ProductEntity {
 
   const category = p.categories?.[0];
 
+  const options = p.options?.map((o) => ({
+    id: o.id,
+    title: o.title ?? '',
+    values: (o.values ?? []).map((val) => val.value).filter(Boolean) as string[],
+  }));
+
   const variants = p.variants
-    ?.map((v) => ({
-      id: v.id,
-      name: v.title ?? '',
-      stock: v.inventory_quantity ?? 0,
-      price: v.calculated_price?.calculated_amount ?? undefined,
-    }))
+    ?.map((v) => {
+      const optionValues: Record<string, string> = {};
+      if (v.options && p.options) {
+        for (const vo of v.options) {
+          const productOption = p.options.find((o) => o.id === (vo as { option_id?: string }).option_id);
+          if (productOption?.title && vo.value) {
+            optionValues[productOption.title] = vo.value;
+          }
+        }
+      }
+      return {
+        id: v.id,
+        name: v.title ?? '',
+        stock: v.inventory_quantity ?? 0,
+        price: v.calculated_price?.calculated_amount ?? undefined,
+        optionValues,
+      };
+    })
     .filter((v) => v.id);
 
   return {
@@ -54,6 +72,7 @@ function toProductEntity(p: HttpTypes.StoreProduct): ProductEntity {
     categoryId: category?.id,
     categoryName: category?.name,
     categorySlug: category?.handle ?? undefined,
+    options: options?.length ? options : undefined,
     variants: variants?.length ? variants : undefined,
     condition: 'new',
     createdAt: p.created_at ?? '',
@@ -92,6 +111,8 @@ function toMedusaOrder(sortBy?: ProductFilters['sortBy']): string | undefined {
 // ── API functions ─────────────────────────────────────────────────────────────
 
 async function getRegionId(): Promise<string | undefined> {
+  const envRegionId = process.env.NEXT_PUBLIC_MEDUSA_REGION_ID;
+  if (envRegionId) return envRegionId;
   const { regions } = await sdk.store.region.list();
   return regions?.[0]?.id;
 }
