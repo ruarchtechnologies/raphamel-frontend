@@ -4,7 +4,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { useProducts } from '@/features/catalog/hooks/useProducts';
 import type { ProductEntity } from '@/domain/entities/product.entity';
@@ -41,13 +40,7 @@ function SearchResults() {
       {/* Page header */}
       <div className="bg-gray-50 border-b border-gray-100 py-5">
         <div className="container">
-          <Breadcrumb
-            items={[
-              { label: 'Home', href: '/' },
-              { label: 'Search' },
-            ]}
-          />
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">
+          <h1 className="text-2xl font-bold text-gray-900">
             {q ? (
               <>
                 Results for{' '}

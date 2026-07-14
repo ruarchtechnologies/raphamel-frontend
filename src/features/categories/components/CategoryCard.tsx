@@ -26,7 +26,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
 import type { CategoryEntity } from '@/domain/entities/category.entity';
 
 interface CategoryCardProps {
@@ -101,10 +100,6 @@ export function CategoryCard({ category, index = 0, priority = false }: Category
                 {category.productCount.toLocaleString()} products
               </span>
             )}
-            {/* FLUTTER EQUIV: Row with Icon — the gap-1 → gap-2 on hover is a CSS transition */}
-            <span className="text-xs font-bold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
-              Browse <ChevronRight size={12} />
-            </span>
           </div>
         </div>
       </Link>

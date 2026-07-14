@@ -242,7 +242,6 @@ export function Header() {
               href="/categories"
               className="flex items-center gap-2 px-4 h-9 bg-primary text-white text-sm font-semibold rounded-[6px] hover:bg-[#005bb5] transition-colors"
             >
-              <Menu size={16} />
               All Categories
             </Link>
 

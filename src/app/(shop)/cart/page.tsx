@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { Minus, Plus, Trash2, ShoppingBag, Tag, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useCartStore } from '@/stores/cart.store';
@@ -29,11 +28,6 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="page-enter">
-        <div className="bg-gray-50 border-b border-gray-100 py-4">
-          <div className="container">
-            <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Cart' }]} />
-          </div>
-        </div>
         <div className="container py-20 flex flex-col items-center text-center">
           <ShoppingBag size={60} className="text-gray-200 mb-5" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
@@ -50,8 +44,7 @@ export default function CartPage() {
     <div className="page-enter">
       <div className="bg-gray-50 border-b border-gray-100 py-4">
         <div className="container">
-          <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Cart' }]} />
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">Shopping Cart</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Shopping Cart</h1>
         </div>
       </div>
 

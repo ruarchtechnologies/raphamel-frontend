@@ -11,7 +11,6 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { PaystackPayment } from '@/components/checkout/PaystackPayment';
 import { usePaystackSession } from '@/features/checkout/hooks/use-paystack-session';
 import { useCart, useClearCart } from '@/features/cart/hooks/useCart';
@@ -21,6 +20,7 @@ import {
   listShippingOptions,
   addShippingMethod,
   initializePaymentSession,
+  getCartPaymentSessionStatus,
   completeCart,
 } from '@/data/api/cart.api';
 import { formatPrice } from '@/lib/utils';
@@ -64,11 +64,13 @@ function OrderSummary({
   items,
   subtotal,
   shippingTotal,
+  taxTotal,
   total,
 }: {
   items: { id: string; title?: string; subtitle?: string; thumbnail?: string; quantity: number; unit_price?: number; subtotal?: number }[];
   subtotal: number;
   shippingTotal: number;
+  taxTotal: number;
   total: number;
 }) {
   return (
@@ -78,15 +80,17 @@ function OrderSummary({
       <ul className="space-y-3 mb-4">
         {items.map((item) => (
           <li key={item.id} className="flex gap-3">
-            <div className="relative w-12 h-14 flex-shrink-0 bg-gray-50 rounded-[6px] overflow-hidden">
-              <Image
-                src={item.thumbnail ?? '/images/product-placeholder.png'}
-                alt={item.title ?? 'Product'}
-                fill
-                className="object-cover"
-                sizes="48px"
-              />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-gray-700 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+            <div className="relative w-12 h-14 flex-shrink-0 flex-none">
+              <div className="w-full h-full bg-gray-50 rounded-[6px] overflow-hidden">
+                <Image
+                  src={item.thumbnail ?? '/images/product-placeholder.png'}
+                  alt={item.title ?? 'Product'}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              </div>
+              <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                 {item.quantity}
               </span>
             </div>
@@ -94,7 +98,7 @@ function OrderSummary({
               <p className="text-xs font-medium text-gray-800 line-clamp-2 leading-snug">
                 {item.title}
               </p>
-              {item.subtitle && (
+              {item.subtitle && item.subtitle.trim().toLowerCase() !== (item.title ?? '').trim().toLowerCase() && (
                 <p className="text-[10px] text-gray-400">{item.subtitle}</p>
               )}
             </div>
@@ -112,10 +116,16 @@ function OrderSummary({
         </div>
         <div className="flex justify-between text-gray-600">
           <span>Shipping</span>
-          <span className={shippingTotal === 0 ? 'text-green-600 font-medium' : 'font-medium'}>
-            {shippingTotal === 0 ? 'Calculated next' : formatPrice(shippingTotal)}
+          <span className={shippingTotal === 0 ? 'text-gray-400 font-normal italic' : 'font-medium'}>
+            {shippingTotal === 0 ? 'Calculated at checkout' : formatPrice(shippingTotal)}
           </span>
         </div>
+        {taxTotal > 0 && (
+          <div className="flex justify-between text-gray-600">
+            <span>VAT</span>
+            <span className="font-medium">{formatPrice(taxTotal)}</span>
+          </div>
+        )}
         <div className="flex justify-between font-bold text-base border-t border-gray-100 pt-2">
           <span>Total</span>
           <span className="text-primary">{formatPrice(total)}</span>
@@ -139,6 +149,7 @@ export default function CheckoutPage() {
   const [shippingOptions, setShippingOptions]     = useState<ShippingOption[]>([]);
   const [selectedShipping, setSelectedShipping]   = useState<string>('');
   const [isContinuing, setIsContinuing]           = useState(false);
+  const [isInitializing, setIsInitializing]       = useState(false);
   const [savedFormData, setSavedFormData]         = useState<FormData | null>(null);
   const [addressMode, setAddressMode]             = useState<'saved' | 'new'>('saved');
 
@@ -165,9 +176,10 @@ export default function CheckoutPage() {
   }, [addressMode, me?.defaultAddress, setValue]);
 
   const items        = cart?.items ?? [];
-  const subtotal     = cart?.subtotal ?? 0;
+  const subtotal     = items.reduce((sum, i) => sum + ((i as { unit_price?: number }).unit_price ?? 0) * i.quantity, 0);
   const shippingTotal = (cart as { shipping_total?: number })?.shipping_total ?? 0;
-  const cartTotal    = cart?.total ?? subtotal;
+  const taxTotal     = (cart as { tax_total?: number })?.tax_total ?? 0;
+  const cartTotal    = subtotal + shippingTotal + taxTotal;
 
   // ── Step 1: validate shipping form → update Medusa cart → fetch shipping options ──
 
@@ -209,6 +221,7 @@ export default function CheckoutPage() {
 
   async function onPlaceOrder() {
     if (!cart || !savedFormData) return;
+    setIsInitializing(true);
 
     // 1. Add shipping method (optional — may not be configured)
     if (selectedShipping) {
@@ -225,9 +238,19 @@ export default function CheckoutPage() {
     //    authorizePayment can verify the same reference after cart.complete().
     let accessCode: string | null = null;
     try {
+      console.log('[checkout] initializing payment session for cart:', cart.id);
       const session = await initializePaymentSession(cart.id);
       accessCode = session.accessCode;
+      console.log('[checkout] accessCode:', accessCode, '| authorizationUrl:', session.authorizationUrl);
+      if (!accessCode) {
+        throw new Error(
+          'Payment setup incomplete — no access code was returned by the payment provider. ' +
+          'Please try again or contact support.'
+        );
+      }
     } catch (err) {
+      console.error('[checkout] initializePaymentSession failed:', err);
+      setIsInitializing(false);
       toast.error(
         err instanceof Error
           ? err.message
@@ -236,7 +259,9 @@ export default function CheckoutPage() {
       return;
     }
 
+    setIsInitializing(false);
     // 3. Open Paystack popup using the access_code from the Medusa session
+    console.log('[checkout] opening Paystack popup with accessCode:', accessCode);
     const reference = await pay({
       amount:    cart.total ?? subtotal,
       email:     savedFormData.email,
@@ -252,13 +277,35 @@ export default function CheckoutPage() {
       },
     });
 
+    console.log('[checkout] Paystack closed — reference:', reference);
     if (!reference) return; // user cancelled or popup closed
 
-    // 4. Complete the Medusa cart — this creates the order
+    // 4. Complete the cart. Medusa calls authorizePayment internally which may verify
+    //    the transaction directly via Paystack's API. If the plugin is webhook-first
+    //    and the session is still requires_more, we poll until the webhook arrives, then retry.
     try {
-      const result = await completeCart(cart.id);
+      let result = await completeCart(cart.id);
+      console.log('[checkout] completeCart result:', JSON.stringify(result, null, 2));
 
       if (result.type !== 'order') {
+        // Webhook hasn't arrived yet — poll for session to become authorized, then retry once.
+        let authorized = false;
+        const deadline = Date.now() + 20000; // wait up to 20 s
+        while (Date.now() < deadline) {
+          const status = await getCartPaymentSessionStatus(cart.id);
+          console.log('[checkout] payment session status:', status);
+          if (status === 'authorized') { authorized = true; break; }
+          await new Promise((r) => setTimeout(r, 2500));
+        }
+
+        if (authorized) {
+          result = await completeCart(cart.id);
+          console.log('[checkout] completeCart (post-auth) result:', JSON.stringify(result, null, 2));
+        }
+      }
+
+      if (result.type !== 'order') {
+        console.error('[checkout] order confirmation failed:', result);
         toast.error(
           `Payment received but order could not be confirmed. ` +
           `Your ref is ${reference} — email support@raphamel.health`
@@ -270,7 +317,8 @@ export default function CheckoutPage() {
       clearCart();
       toast.success('Payment confirmed! Your order is being processed.');
       router.push(`/order-confirmation?ref=${reference}`);
-    } catch {
+    } catch (err) {
+      console.error('[checkout] error completing cart:', err);
       toast.error(
         `Order confirmation failed. ` +
         `Your payment ref is ${reference} — email support@raphamel.health`
@@ -329,40 +377,8 @@ export default function CheckoutPage() {
     );
   }
 
-  const STEPS: CheckoutStep[] = ['shipping', 'payment'];
-  const stepLabels = { shipping: 'Shipping', payment: 'Payment' };
-
   return (
     <div className="page-enter">
-      {/* Breadcrumb */}
-      <div className="bg-gray-50 border-b border-gray-100 py-4">
-        <div className="container">
-          <Breadcrumb
-            items={[
-              { label: 'Home', href: '/' },
-              { label: 'Cart', href: '/cart' },
-              { label: 'Checkout' },
-            ]}
-          />
-        </div>
-      </div>
-
-      {/* Step indicator */}
-      <div className="border-b border-gray-100">
-        <div className="container py-4">
-          <div className="flex items-center gap-2 text-sm">
-            {STEPS.map((s, i) => (
-              <span key={s} className="flex items-center gap-2">
-                {i > 0 && <ChevronRight size={14} className="text-gray-300" />}
-                <span className={s === step ? 'font-semibold text-primary' : 'text-gray-400'}>
-                  {stepLabels[s]}
-                </span>
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
       <div className="container py-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start">
 
@@ -534,11 +550,15 @@ export default function CheckoutPage() {
                   variant="primary"
                   size="lg"
                   className="w-full"
-                  loading={isPaying}
-                  disabled={isPaying || (shippingOptions.length > 0 && !selectedShipping)}
+                  loading={isInitializing || isPaying}
+                  disabled={isInitializing || isPaying || (shippingOptions.length > 0 && !selectedShipping)}
                   onClick={onPlaceOrder}
                 >
-                  {isPaying ? 'Awaiting payment…' : `Place Order & Pay ${formatPrice(cartTotal)}`}
+                  {isInitializing
+                    ? 'Setting up payment…'
+                    : isPaying
+                    ? 'Awaiting payment…'
+                    : `Place Order & Pay ${formatPrice(cartTotal)}`}
                 </Button>
 
                 <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
@@ -558,6 +578,7 @@ export default function CheckoutPage() {
                 items={items as Parameters<typeof OrderSummary>[0]['items']}
                 subtotal={subtotal}
                 shippingTotal={shippingTotal}
+                taxTotal={taxTotal}
                 total={cartTotal}
               />
             )}

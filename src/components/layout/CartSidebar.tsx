@@ -16,7 +16,10 @@ export function CartSidebar() {
   const { mutate: removeItem, isPending: isRemoving } = useRemoveCartItem();
 
   const items    = cart?.items ?? [];
-  const subtotal = cart?.subtotal ?? 0;
+  const subtotal = items.reduce(
+    (sum, item) => sum + ((item as { unit_price?: number }).unit_price ?? 0) * item.quantity,
+    0,
+  );
   const isBusy   = isUpdating || isRemoving;
 
   const footer = (

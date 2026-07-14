@@ -3,15 +3,15 @@
 import { use, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Heart, Share2, Truck, Shield, RefreshCcw, Minus, Plus } from 'lucide-react';
+import { ShoppingCart, Share2, Truck, Shield, RefreshCcw, Minus, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { PriceDisplay } from '@/components/products/PriceDisplay';
 import { useAddToCart } from '@/features/cart/hooks/useCart';
 import { useProductBySlug } from '@/features/catalog/hooks/useProducts';
+import { WishlistButton } from '@/components/products/WishlistButton';
 import { cn } from '@/lib/utils';
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
@@ -19,13 +19,6 @@ import { cn } from '@/lib/utils';
 function ProductDetailSkeleton() {
   return (
     <div className="animate-pulse">
-      {/* Breadcrumb bar placeholder — matches the real bar's height */}
-      <div className="bg-gray-50 border-b border-gray-100 py-4">
-        <div className="container">
-          <div className="h-4 bg-gray-200 rounded w-48" />
-        </div>
-      </div>
-
       <div className="container py-8">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           <div className="lg:w-[48%] flex-shrink-0">
@@ -202,21 +195,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="page-enter">
-      {/* Breadcrumb */}
-      <div className="bg-gray-50 border-b border-gray-100 py-4">
-        <div className="container">
-          <Breadcrumb
-            items={[
-              { label: 'Home', href: '/' },
-              ...(product.categoryName && product.categorySlug
-                ? [{ label: product.categoryName, href: `/categories/${product.categorySlug}` }]
-                : [{ label: 'Products', href: '/products' }]),
-              { label: product.name },
-            ]}
-          />
-        </div>
-      </div>
-
       <div className="container py-8">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* Gallery */}
@@ -261,9 +239,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                   {salePercent && <Badge variant="sale">-{salePercent}%</Badge>}
                 </div>
 
-                <button className="absolute top-3 right-3 w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center text-gray-500 hover:text-rose-500 hover:scale-110 transition-all">
-                  <Heart size={16} />
-                </button>
+                <WishlistButton
+                  variantId={resolvedVariant?.id}
+                  variant="inline"
+                  className="absolute top-3 right-3"
+                />
               </div>
             </div>
           </div>

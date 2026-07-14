@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {
-  User, ShoppingBag, MapPin, Settings, LogOut, ChevronRight,
+  User, ShoppingBag, MapPin, Settings, LogOut, ChevronRight, Heart,
 } from 'lucide-react';
 import { useMe, useLogout } from '@/features/auth/hooks/useAuth';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { label: 'My Profile',  href: '/account',           icon: User },
   { label: 'My Orders',   href: '/account/orders',     icon: ShoppingBag },
+  { label: 'Wishlist',    href: '/account/wishlist',   icon: Heart },
   { label: 'Addresses',   href: '/account/addresses',  icon: MapPin },
   { label: 'Settings',    href: '/account/settings',   icon: Settings },
 ] as const;

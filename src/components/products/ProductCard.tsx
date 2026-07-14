@@ -1,15 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, Eye, ShoppingCart, GitCompare } from 'lucide-react';
+import { ShoppingBag, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
-import { Badge } from '@/components/ui/Badge';
-import { StarRating } from '@/components/ui/StarRating';
-import { PriceDisplay } from './PriceDisplay';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAddToCart } from '@/features/cart/hooks/useCart';
-import { getDiscountPercent, truncate } from '@/lib/utils';
+import { WishlistButton } from '@/components/products/WishlistButton';
+import { formatPrice, truncate } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 export interface ProductCardData {
   id: string;
@@ -19,14 +19,17 @@ export interface ProductCardData {
   compareAtPrice?: number;
   image: string;
   images?: string[];
+  /** Unused display fields — kept for interface compatibility */
   rating?: number;
   reviewCount?: number;
   vendorName?: string;
   isNew?: boolean;
   isFeatured?: boolean;
-  stock?: number;
   badge?: string;
+  stock?: number;
   variantId?: string;
+  /** Show "From " prefix when the product has variants with different prices */
+  showFromPrefix?: boolean;
 }
 
 interface ProductCardProps {
@@ -35,21 +38,23 @@ interface ProductCardProps {
   index?: number;
 }
 
-export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCardProps) {
-  const { mutate: addToCart, isPending: isAddingToCart } = useAddToCart();
-  const isOutOfStock = product.stock === 0;
-  const discountPercent =
-    product.compareAtPrice
-      ? getDiscountPercent(product.compareAtPrice, product.price)
-      : 0;
+type CartState = 'idle' | 'loading' | 'done';
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCardProps) {
+  const [cartState, setCartState] = useState<CartState>('idle');
+  const { mutate: addToCart } = useAddToCart();
+
+  const isOutOfStock = product.stock === 0;
+  const isDisabled = isOutOfStock || !product.variantId;
+
+  function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (isOutOfStock || !product.variantId) return;
+    if (isDisabled || cartState !== 'idle') return;
+    setCartState('loading');
     addToCart(
       {
-        variantId: product.variantId,
+        variantId: product.variantId!,
         quantity: 1,
         title: product.name,
         thumbnail: product.image,
@@ -57,155 +62,185 @@ export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCard
       },
       {
         onSuccess: () => {
+          setCartState('done');
           toast.success('Added to cart', {
             description: truncate(product.name, 40),
             duration: 2000,
           });
+          setTimeout(() => setCartState('idle'), 1200);
+        },
+        onError: () => {
+          setCartState('idle');
+          toast.error('Could not add to cart. Please try again.');
         },
       },
     );
-  };
+  }
 
-  const handleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toast.success('Added to wishlist');
-  };
-
+  // ── List layout ─────────────────────────────────────────────────────────────
   if (layout === 'list') {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.04, duration: 0.3 }}
+        transition={{ delay: index * 0.04, duration: 0.25 }}
+        className="group flex gap-3 p-3 bg-white border border-gray-100 rounded-[6px] hover:border-gray-200 hover:shadow-sm transition-all duration-200"
       >
-        <Link
-          href={`/products/${product.slug}`}
-          className="flex gap-4 p-4 bg-white border border-gray-100 rounded-[8px] hover:border-gray-200 hover:shadow-md transition-all group"
-        >
-          <div className="w-32 h-32 flex-shrink-0 bg-gray-50 rounded-[6px] overflow-hidden">
-            <Image
-              src={product.image}
-              alt={product.name}
-              width={128}
-              height={128}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-          <div className="flex-1 min-w-0 flex flex-col">
-            {/* DISABLED: vendor/supplier feature removed
-          {product.vendorName && (
-              <span className="text-xs text-gray-400 mb-0.5">{product.vendorName}</span>
-            )}
-          */}
-            <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
-              {product.name}
-            </h3>
-            {product.rating !== undefined && (
-              <StarRating rating={product.rating} count={product.reviewCount} size="sm" className="mt-1" />
-            )}
-            <div className="mt-auto pt-2">
-              <PriceDisplay price={product.price} compareAtPrice={product.compareAtPrice} size="sm" />
-            </div>
-          </div>
-          {product.variantId && (
-            <button
-              onClick={handleAddToCart}
-              disabled={isAddingToCart || isOutOfStock}
-              className="self-center flex-shrink-0 h-9 px-3 bg-primary text-white text-xs font-semibold rounded-[6px] hover:bg-[#005bb5] disabled:opacity-60 transition-colors"
-            >
-              {isAddingToCart ? 'Adding…' : 'Add to Cart'}
-            </button>
-          )}
-        </Link>
-      </motion.div>
-    );
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.35 }}
-    >
-      <Link href={`/products/${product.slug}`} className="product-card block group">
-        {/* Thumbnail */}
-        <div className="relative overflow-hidden bg-gray-50 rounded-t-[6px]" style={{ padding: '0.375rem' }}>
-          <div className="relative aspect-[3/4] rounded-[4px] overflow-hidden bg-gray-100">
+        <Link href={`/products/${product.slug}`} className="flex-shrink-0 w-[72px] h-[72px] bg-[#f4f6f8] rounded-[4px] overflow-hidden">
+          <div className="relative w-full h-full">
             <Image
               src={product.image}
               alt={product.name}
               fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="72px"
+              className="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
             />
-
-            {/* Badges */}
-            <div className="absolute top-2 left-2 flex flex-col gap-1">
-              {isOutOfStock && <Badge variant="out">Out of Stock</Badge>}
-              {!isOutOfStock && discountPercent > 0 && (
-                <Badge variant="sale">-{discountPercent}%</Badge>
-              )}
-              {product.isNew && !discountPercent && <Badge variant="new">New</Badge>}
-            </div>
-
-            {/* Action buttons */}
-            <div className="product-actions">
-              <button
-                onClick={handleWishlist}
-                className="w-[30px] h-[30px] rounded-full bg-white shadow-md flex items-center justify-center text-gray-500 hover:text-rose-500 hover:scale-110 transition-all"
-                title="Add to Wishlist"
-              >
-                <Heart size={14} />
-              </button>
-              <button
-                className="w-[30px] h-[30px] rounded-full bg-white shadow-md flex items-center justify-center text-gray-500 hover:text-primary hover:scale-110 transition-all"
-                title="Quick View"
-              >
-                <Eye size={14} />
-              </button>
-              <button
-                className="w-[30px] h-[30px] rounded-full bg-white shadow-md flex items-center justify-center text-gray-500 hover:text-primary hover:scale-110 transition-all"
-                title="Compare"
-              >
-                <GitCompare size={14} />
-              </button>
-            </div>
-
-            {/* Add to cart slide-up */}
-            {!isOutOfStock && product.variantId && (
-              <div className="product-add-cart px-2 pb-2">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={isAddingToCart}
-                  className="w-full h-9 bg-gray-900 hover:bg-primary disabled:opacity-60 text-white text-xs font-semibold rounded-[6px] flex items-center justify-center gap-2 transition-colors"
-                >
-                  <ShoppingCart size={14} />
-                  {isAddingToCart ? 'Adding…' : 'Add to Cart'}
-                </button>
-              </div>
-            )}
           </div>
+        </Link>
+        <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5 py-0.5">
+          <Link href={`/products/${product.slug}`}>
+            <h3 className="text-sm font-medium text-gray-800 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-150">
+              {product.name}
+            </h3>
+          </Link>
+          <p className="text-[0.9375rem] font-semibold text-slate-800 leading-tight">
+            {product.showFromPrefix && (
+              <span className="text-xs font-normal text-gray-400 mr-0.5">From </span>
+            )}
+            {formatPrice(product.price)}
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
+              <span className="ml-2 text-xs font-normal text-gray-400 line-through">
+                {formatPrice(product.compareAtPrice)}
+              </span>
+            )}
+          </p>
         </div>
+        <div className="flex-shrink-0 flex items-center gap-2">
+          <WishlistButton variantId={product.variantId} variant="inline" />
+          <button
+            onClick={handleAddToCart}
+            disabled={isDisabled}
+            aria-label={`Add ${product.name} to cart`}
+            className={cn(
+              'flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-150',
+              isDisabled
+                ? 'border border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+                : 'border border-gray-200 bg-white text-gray-400 hover:bg-primary hover:border-primary hover:text-white',
+            )}
+          >
+            {cartState === 'loading' ? (
+              <svg className="w-[15px] h-[15px] animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" strokeOpacity="0.25" />
+                <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+            ) : cartState === 'done' ? (
+              <Check size={15} className="text-emerald-500" />
+            ) : (
+              <ShoppingBag size={15} />
+            )}
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
-        {/* Info */}
-        <div className="p-3">
-          {/* DISABLED: vendor/supplier feature removed
-          {product.vendorName && (
-            <p className="text-xs text-gray-400 mb-0.5 truncate">{product.vendorName}</p>
-          )}
-          */}
-          <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+  // ── Grid layout ─────────────────────────────────────────────────────────────
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.06, duration: 0.3, ease: 'easeOut' }}
+      whileHover={{ y: -2, transition: { duration: 0.18 } }}
+      className="group rounded-[16px] border border-[rgba(0,113,220,0.18)] overflow-hidden bg-white transition-[border-color,box-shadow] duration-200 hover:border-[rgba(0,113,220,0.55)] hover:shadow-product"
+    >
+      {/* Full-bleed image with wishlist overlay */}
+      <Link
+        href={`/products/${product.slug}`}
+        className="block relative aspect-[4/3] bg-[#f4f6f8] overflow-hidden"
+      >
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes="(max-width: 576px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        />
+        <WishlistButton
+          variantId={product.variantId}
+          variant="overlay"
+          className="absolute top-2 right-2"
+        />
+      </Link>
+
+      <div className="h-px bg-[rgba(0,113,220,0.18)]" />
+
+      {/* Info section */}
+      <div className="px-[14px] pt-[10px] pb-[12px]">
+        <Link href={`/products/${product.slug}`} className="block min-w-0">
+          <h3 className="text-[14.5px] font-medium text-gray-900 truncate leading-tight group-hover:text-primary transition-colors duration-150">
             {product.name}
           </h3>
-          {product.rating !== undefined && (
-            <StarRating rating={product.rating} count={product.reviewCount} size="sm" className="mt-1" />
-          )}
-          <div className="mt-1.5">
-            <PriceDisplay price={product.price} compareAtPrice={product.compareAtPrice} size="sm" />
-          </div>
+        </Link>
+
+        <div className="mt-2.5 flex items-center justify-between gap-3">
+          <p className="text-base font-medium text-gray-900 leading-none">
+            {product.showFromPrefix && (
+              <span className="text-[13px] font-normal text-gray-400 mr-0.5">From </span>
+            )}
+            {formatPrice(product.price)}
+          </p>
+
+          <button
+            onClick={handleAddToCart}
+            disabled={isDisabled}
+            aria-label={`Add ${product.name} to cart`}
+            className={cn(
+              'w-[34px] h-[34px] flex-shrink-0 rounded-full flex items-center justify-center transition-all duration-150',
+              isDisabled
+                ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                : 'bg-primary text-white hover:brightness-110 hover:scale-105 active:scale-95',
+            )}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {cartState === 'loading' ? (
+                <motion.svg
+                  key="spin"
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.6 }}
+                  transition={{ duration: 0.1 }}
+                  className="w-[15px] h-[15px] animate-spin"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" strokeOpacity="0.35" />
+                  <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                </motion.svg>
+              ) : cartState === 'done' ? (
+                <motion.div
+                  key="check"
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1.1 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                >
+                  <Check size={15} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="bag"
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.6 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <ShoppingBag size={15} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
         </div>
-      </Link>
+      </div>
     </motion.div>
   );
 }

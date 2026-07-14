@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { BadgeCheck, Star, Package } from 'lucide-react';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Badge } from '@/components/ui/Badge';
 import type { Metadata } from 'next';
 

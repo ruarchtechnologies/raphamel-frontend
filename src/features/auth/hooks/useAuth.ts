@@ -29,6 +29,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { login, register, logout, fetchMe, updateProfile, forgotPassword, resetPassword } from '@/data/api/auth.api';
 import type { LoginPayload, RegisterPayload, UpdateProfilePayload } from '@/data/api/auth.api';
 import { setAuthCookie, setStatusCookie, clearAuthCookie } from '@/lib/auth-cookie';
+import { clearWishlistId } from '@/data/api/wishlist.api';
+import { wishlistKeys } from '@/features/wishlist/hooks/useWishlist';
 import { toast } from 'sonner';
 
 export const authKeys = {
@@ -62,6 +64,8 @@ export function useLogin() {
     mutationFn: (payload: LoginPayload) => login(payload),
     onSuccess: (data) => {
       queryClient.setQueryData(authKeys.me, data.user);
+      // Bust the wishlist cache so the new session re-fetches a clean wishlist
+      queryClient.invalidateQueries({ queryKey: wishlistKeys.detail() });
       setAuthCookie();
       setStatusCookie(data.user.verificationStatus);
       toast.success(`Welcome back, ${data.user.firstName}!`);
@@ -79,6 +83,8 @@ export function useRegister() {
     mutationFn: (payload: RegisterPayload) => register(payload),
     onSuccess: (data) => {
       queryClient.setQueryData(authKeys.me, data.user);
+      // Bust the wishlist cache so the new session re-fetches a clean wishlist
+      queryClient.invalidateQueries({ queryKey: wishlistKeys.detail() });
       setAuthCookie();
       setStatusCookie(data.user.verificationStatus);
       toast.success('Account created successfully!');
@@ -100,6 +106,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
+      clearWishlistId();
       queryClient.clear();
       clearAuthCookie();
       toast.success('Signed out successfully.');

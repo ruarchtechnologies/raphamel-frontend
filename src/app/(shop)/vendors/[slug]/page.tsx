@@ -5,7 +5,6 @@ export const runtime = 'edge';
 // import Image from 'next/image';
 // import Link from 'next/link';
 // import { BadgeCheck, Star, Package, MapPin, Globe, Mail } from 'lucide-react';
-// import { Breadcrumb } from '@/components/ui/Breadcrumb';
 // import { Badge } from '@/components/ui/Badge';
 // import { ProductGrid } from '@/components/products/ProductGrid';
 // import type { ProductCardData } from '@/components/products/ProductCard';

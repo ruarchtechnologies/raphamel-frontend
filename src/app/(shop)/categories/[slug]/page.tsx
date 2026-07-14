@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { use } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { useCategoryBySlug } from '@/features/categories/hooks/useCategories';
 import { useProductsByCategory } from '@/features/catalog/hooks/useProducts';
@@ -53,7 +52,7 @@ export default function CategoryDetailPage({ params }: Props) {
   const { slug } = use(params);
 
   const { data: category, isLoading: catLoading } = useCategoryBySlug(slug);
-  const { data: productsPage, isLoading: prodLoading } = useProductsByCategory(slug);
+  const { data: productsPage, isLoading: prodLoading, isError: prodError } = useProductsByCategory(slug);
   const { data: allCategories } = useCategories();
 
   const products = productsPage?.data ?? [];
@@ -104,14 +103,7 @@ export default function CategoryDetailPage({ params }: Props) {
           )}
 
           <div className="container relative z-10">
-            <Breadcrumb
-              items={[
-                { label: 'Home', href: '/' },
-                { label: 'Categories', href: '/categories' },
-                { label: category?.name ?? '' },
-              ]}
-            />
-            <div className="mt-3 max-w-2xl">
+            <div className="max-w-2xl">
               <h1 className="text-3xl font-bold text-gray-900">{category?.name}</h1>
               {category?.description && (
                 <p className="text-gray-600 mt-2 text-base leading-relaxed">
@@ -132,6 +124,20 @@ export default function CategoryDetailPage({ params }: Props) {
       <div className="container py-8">
         {isLoading ? (
           <ProductGrid products={[]} loading total={0} columns={4} showToolbar />
+        ) : prodError ? (
+          <div className="text-center py-20">
+            <p className="text-4xl mb-4">⚠️</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Could not load products</h2>
+            <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+              There was a problem fetching products for this category. Please try again.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center h-11 px-6 bg-primary text-white text-sm font-bold rounded-[6px] hover:bg-[#005bb5] transition-colors"
+            >
+              Retry
+            </button>
+          </div>
         ) : products.length > 0 ? (
           <ProductGrid
             products={products.map(toCardData)}

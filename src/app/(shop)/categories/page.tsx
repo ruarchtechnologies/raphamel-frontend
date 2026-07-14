@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { CategoryCard } from '@/features/categories/components/CategoryCard';
 import { fetchCategories } from '@/data/api/categories.api';
 
@@ -25,7 +24,6 @@ export default async function CategoriesPage() {
       {/* Page header */}
       <div className="bg-gray-50 border-b border-gray-100 py-8">
         <div className="container">
-          <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Categories' }]} />
           <div className="mt-3">
             <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Browse</p>
             <h1 className="text-3xl font-bold text-gray-900">Medical Supply Categories</h1>

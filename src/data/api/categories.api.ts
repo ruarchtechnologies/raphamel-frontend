@@ -1,18 +1,19 @@
 import { sdk } from '@/lib/medusa';
 import type { HttpTypes } from '@medusajs/types';
 import type { CategoryEntity } from '@/domain/entities/category.entity';
-import { HEALTH_CATEGORIES } from '@/domain/entities/category.entity';
+import { HEALTH_CATEGORIES, findCategoryBySlug } from '@/domain/entities/category.entity';
 
 /**
  * Merge a Medusa category with local visual config (color + image).
  * Medusa stores business data; colors/images live in HEALTH_CATEGORIES.
  */
 function toEntity(cat: HttpTypes.StoreProductCategory): CategoryEntity {
-  const local = HEALTH_CATEGORIES.find((h) => h.slug === cat.handle);
+  const handle = (cat.handle ?? '').trim();
+  const local = HEALTH_CATEGORIES.find((h) => h.slug === handle);
   return {
     id: cat.id,
     name: cat.name ?? '',
-    slug: cat.handle ?? '',
+    slug: handle,
     description: cat.description ?? local?.description,
     image: local?.image,
     color: local?.color,
@@ -33,11 +34,28 @@ export async function fetchCategories(): Promise<CategoryEntity[]> {
 
 /** Fetch a single category by its URL handle/slug. Returns null if not found. */
 export async function fetchCategoryBySlug(slug: string): Promise<CategoryEntity | null> {
-  const { product_categories } = await sdk.store.category.list({
-    handle: slug,
-    limit: 1,
-    fields: '+products_count',
-  });
-  const cat = product_categories[0];
-  return cat ? toEntity(cat) : null;
+  try {
+    let { product_categories } = await sdk.store.category.list({
+      handle: slug,
+      limit: 1,
+      fields: '+products_count',
+    });
+    // Handles in Medusa may have stray trailing whitespace; fall back to a
+    // trimmed match across all categories before hitting the static fallback.
+    if (!product_categories.length) {
+      const { product_categories: all } = await sdk.store.category.list({
+        limit: 100,
+        fields: '+products_count',
+      });
+      const match = all.find((c) => (c.handle ?? '').trim() === slug.trim());
+      if (match) product_categories = [match];
+    }
+    const cat = product_categories[0];
+    if (cat) return toEntity(cat);
+  } catch {
+    // Medusa API error — fall through to static fallback
+  }
+  // Fall back to static HEALTH_CATEGORIES so category pages render even before
+  // Medusa categories are created with matching handles.
+  return findCategoryBySlug(slug) ?? null;
 }

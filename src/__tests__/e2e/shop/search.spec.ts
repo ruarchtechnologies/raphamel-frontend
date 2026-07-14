@@ -39,11 +39,6 @@ test.describe('Search page', () => {
     await expect(page).toHaveURL(/q=syringe/);
   });
 
-  test('breadcrumb is visible on search page', async ({ page }) => {
-    await page.goto('/search?q=gloves');
-    await expect(page.locator('nav[aria-label="Breadcrumb"] a[href="/"]')).toBeVisible({ timeout: 6000 });
-  });
-
   test('shows error state and retry button on API failure', async ({ page }) => {
     await page.route('http://medusa-test.local/store/products**', (route) =>
       route.fulfill({ status: 500, json: { message: 'Server error' } }),

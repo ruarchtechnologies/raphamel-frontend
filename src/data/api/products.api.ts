@@ -4,10 +4,11 @@ import type { ProductEntity } from '@/domain/entities/product.entity';
 import type { HttpTypes } from '@medusajs/types';
 
 // Fields for product list endpoints (homepage, search, category pages).
-// *categories is intentionally excluded when filtering by category_id because
-// expanding the categories relation conflicts with the category_id WHERE clause
-// in Medusa v2 and returns zero results. Use CATEGORY_LIST_FIELDS for those queries.
-const LIST_FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images,*categories';
+// *categories is excluded from list queries because expanding the categories relation
+// alongside a category_id filter returns zero results in Medusa v2, and fetching
+// it without a filter requires extra per-row joins that slow the list endpoint.
+// Category metadata (name, slug) is still included via DETAIL_FIELDS for product pages.
+const LIST_FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images';
 const CATEGORY_LIST_FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images';
 
 // Fields for the single product detail page only.
@@ -143,12 +144,7 @@ export async function fetchProducts(
 
   const { products, count } = await sdk.store.product.list(params);
 
-  // Only show products attached to at least one category
-  const categorised = filters.categoryId
-    ? products
-    : products.filter((p) => p.categories && p.categories.length > 0);
-
-  return toPaginatedResponse(categorised, count ?? 0, offset, limit);
+  return toPaginatedResponse(products, count ?? 0, offset, limit);
 }
 
 export async function fetchProductBySlug(slug: string): Promise<ProductEntity> {
@@ -176,12 +172,37 @@ export async function fetchProductsByCategory(
   categorySlug: string,
   filters: ProductFilters = {},
 ): Promise<PaginatedResponse<ProductEntity>> {
-  // Step 1: resolve category handle → ID
-  const { product_categories } = await sdk.store.category.list({ handle: categorySlug, limit: 1 });
+  const limit  = filters.limit ?? 20;
+  const page   = filters.page  ?? 1;
+  const offset = (page - 1) * limit;
+
+  // Step 1: resolve slug → category ID.
+  // Handles in Medusa may have stray trailing whitespace, so exact handle filter
+  // can fail. Fetch a broad list and match by trimmed handle as a fallback.
+  let { product_categories } = await sdk.store.category.list({ handle: categorySlug, limit: 1 });
   if (!product_categories.length) {
-    return { data: [], meta: { total: 0, page: 1, limit: filters.limit ?? 20, lastPage: 0 } };
+    const { product_categories: all } = await sdk.store.category.list({ limit: 100 });
+    const match = all.find((c) => (c.handle ?? '').trim() === categorySlug.trim());
+    if (match) product_categories = [match];
+  }
+  if (!product_categories.length) {
+    return { data: [], meta: { total: 0, page: 1, limit, lastPage: 0 } };
   }
 
-  // Step 2: fetch products filtered by that category ID
-  return fetchProducts({ ...filters, categoryId: product_categories[0].id });
+  const regionId = await getRegionId();
+
+  // Step 2: query products directly — bypass fetchProducts so *categories expansion
+  // never appears alongside the category_id filter (they conflict in Medusa v2).
+  const params: Record<string, unknown> = {
+    fields: CATEGORY_LIST_FIELDS,
+    limit,
+    offset,
+    category_id: [product_categories[0].id],
+  };
+  if (regionId) params.region_id = regionId;
+  const order = toMedusaOrder(filters.sortBy);
+  if (order) params.order = order;
+
+  const { products, count } = await sdk.store.product.list(params);
+  return toPaginatedResponse(products, count ?? 0, offset, limit);
 }

@@ -7,6 +7,7 @@ const nextConfig = {
   },
   images: {
     qualities: [75, 85],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days — prevents re-fetching slow Supabase images on every cold request
     remotePatterns: [
       ...(process.env.NODE_ENV === 'development' ? [{ protocol: 'http', hostname: 'localhost' }] : []),
       { protocol: 'https', hostname: 'staging.api.raphamel.com' },
