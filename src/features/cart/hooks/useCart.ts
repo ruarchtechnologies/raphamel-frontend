@@ -15,14 +15,31 @@ export const cartKeys = {
   cart: ['cart'] as const,
 };
 
+type CartData = Awaited<ReturnType<typeof getOrCreateCart>>;
+type CartItem = NonNullable<CartData['items']>[number];
+
+function recalcTotals(items: CartItem[], shippingTotal: number) {
+  const subtotal = items.reduce((sum, i) => sum + ((i as any).unit_price ?? 0) * i.quantity, 0);
+  return { subtotal, total: subtotal + shippingTotal };
+}
+
 /** Fetch (or create) the current Medusa cart. Always returns a cart. */
 export function useCart() {
   return useQuery({
     queryKey: cartKeys.cart,
     queryFn: getOrCreateCart,
-    staleTime: 1000 * 30,   // 30 s — cart data is fresh enough for most interactions
+    staleTime: 1000 * 30,
     retry: 1,
   });
+}
+
+export interface AddToCartParams {
+  variantId: string;
+  quantity: number;
+  /** Pass these so the cart opens instantly with the item visible before the server responds. */
+  title?: string;
+  thumbnail?: string;
+  unitPrice?: number;
 }
 
 /** Add a variant to the cart. Creates the cart if one does not exist yet. */
@@ -31,17 +48,55 @@ export function useAddToCart() {
   const setCartOpen = useUIStore((s) => s.setCartOpen);
 
   return useMutation({
-    mutationFn: async ({ variantId, quantity }: { variantId: string; quantity: number }) => {
-      const cached = queryClient.getQueryData<Awaited<ReturnType<typeof getOrCreateCart>>>(cartKeys.cart);
-      const cart = cached ?? await getOrCreateCart();
+    mutationFn: async ({ variantId, quantity }: AddToCartParams) => {
+      const cached = queryClient.getQueryData<CartData>(cartKeys.cart);
+      const cart = cached ?? (await getOrCreateCart());
       return addLineItem(cart.id, variantId, quantity);
+    },
+    onMutate: async ({ variantId, quantity, title, thumbnail, unitPrice }) => {
+      await queryClient.cancelQueries({ queryKey: cartKeys.cart });
+      const previous = queryClient.getQueryData<CartData>(cartKeys.cart);
+
+      if (previous && title && unitPrice !== undefined) {
+        const shippingTotal = (previous as any).shipping_total ?? 0;
+        const existing = previous.items?.find((i) => (i as any).variant_id === variantId);
+
+        const items: CartItem[] = existing
+          ? (previous.items ?? []).map((i) =>
+              (i as any).variant_id === variantId
+                ? { ...i, quantity: i.quantity + quantity, subtotal: (i as any).unit_price * (i.quantity + quantity) }
+                : i
+            )
+          : [
+              ...(previous.items ?? []),
+              {
+                id: `optimistic_${Date.now()}`,
+                title,
+                subtitle: null,
+                thumbnail: thumbnail ?? null,
+                quantity,
+                unit_price: unitPrice,
+                subtotal: unitPrice * quantity,
+                variant_id: variantId,
+              } as unknown as CartItem,
+            ];
+
+        queryClient.setQueryData<CartData>(cartKeys.cart, {
+          ...previous,
+          items,
+          ...recalcTotals(items, shippingTotal),
+        });
+      }
+
+      setCartOpen(true);
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(cartKeys.cart, ctx.previous);
+      toast.error('Could not add item to cart. Please try again.');
     },
     onSuccess: (updatedCart) => {
       queryClient.setQueryData(cartKeys.cart, updatedCart);
-      setCartOpen(true);
-    },
-    onError: () => {
-      toast.error('Could not add item to cart. Please try again.');
     },
   });
 }
@@ -60,11 +115,29 @@ export function useUpdateCartItem() {
       lineItemId: string;
       quantity: number;
     }) => updateLineItem(cartId, lineItemId, quantity),
+    onMutate: async ({ lineItemId, quantity }) => {
+      await queryClient.cancelQueries({ queryKey: cartKeys.cart });
+      const previous = queryClient.getQueryData<CartData>(cartKeys.cart);
+
+      queryClient.setQueryData<CartData>(cartKeys.cart, (old) => {
+        if (!old) return old;
+        const shippingTotal = (old as any).shipping_total ?? 0;
+        const items = (old.items ?? []).map((i) =>
+          i.id === lineItemId
+            ? { ...i, quantity, subtotal: (i as any).unit_price * quantity }
+            : i,
+        );
+        return { ...old, items, ...recalcTotals(items, shippingTotal) };
+      });
+
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(cartKeys.cart, ctx.previous);
+      toast.error('Could not update cart.');
+    },
     onSuccess: (updatedCart) => {
       queryClient.setQueryData(cartKeys.cart, updatedCart);
-    },
-    onError: () => {
-      toast.error('Could not update cart.');
     },
   });
 }
@@ -76,12 +149,26 @@ export function useRemoveCartItem() {
   return useMutation({
     mutationFn: ({ cartId, lineItemId }: { cartId: string; lineItemId: string }) =>
       removeLineItem(cartId, lineItemId),
+    onMutate: async ({ lineItemId }) => {
+      await queryClient.cancelQueries({ queryKey: cartKeys.cart });
+      const previous = queryClient.getQueryData<CartData>(cartKeys.cart);
+
+      queryClient.setQueryData<CartData>(cartKeys.cart, (old) => {
+        if (!old) return old;
+        const shippingTotal = (old as any).shipping_total ?? 0;
+        const items = (old.items ?? []).filter((i) => i.id !== lineItemId);
+        return { ...old, items, ...recalcTotals(items, shippingTotal) };
+      });
+
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(cartKeys.cart, ctx.previous);
+      toast.error('Could not remove item.');
+    },
     onSuccess: (updatedCart) => {
       queryClient.setQueryData(cartKeys.cart, updatedCart);
       toast.success('Item removed from cart.');
-    },
-    onError: () => {
-      toast.error('Could not remove item.');
     },
   });
 }

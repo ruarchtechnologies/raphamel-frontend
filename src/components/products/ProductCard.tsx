@@ -48,7 +48,13 @@ export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCard
     e.stopPropagation();
     if (isOutOfStock || !product.variantId) return;
     addToCart(
-      { variantId: product.variantId, quantity: 1 },
+      {
+        variantId: product.variantId,
+        quantity: 1,
+        title: product.name,
+        thumbnail: product.image,
+        unitPrice: product.price,
+      },
       {
         onSuccess: () => {
           toast.success('Added to cart', {

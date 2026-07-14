@@ -24,6 +24,7 @@
  * - React Query: you CALL mutate() and the hook gives you { isPending, isError, data }
  */
 
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { login, register, logout, fetchMe, updateProfile, forgotPassword, resetPassword } from '@/data/api/auth.api';
 import type { LoginPayload, RegisterPayload, UpdateProfilePayload } from '@/data/api/auth.api';
@@ -36,12 +37,22 @@ export const authKeys = {
 
 /** Get the currently authenticated user. Returns null if not logged in. */
 export function useMe() {
-  return useQuery({
+  const result = useQuery({
     queryKey: authKeys.me,
     queryFn: fetchMe,
     retry: false,
     staleTime: 1000 * 60 * 5,
   });
+
+  // When the Medusa JWT has expired the cookie outlives the session.
+  // Clear it so the middleware stops redirecting /login → /account.
+  useEffect(() => {
+    if (!result.isPending && result.data === null) {
+      clearAuthCookie();
+    }
+  }, [result.isPending, result.data]);
+
+  return result;
 }
 
 /** Login mutation. */

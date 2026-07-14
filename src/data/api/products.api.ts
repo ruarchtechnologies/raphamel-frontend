@@ -4,9 +4,11 @@ import type { ProductEntity } from '@/domain/entities/product.entity';
 import type { HttpTypes } from '@medusajs/types';
 
 // Fields for product list endpoints (homepage, search, category pages).
-// Lean on purpose — options expansion is not needed for cards and can
-// conflict with Medusa's category_id filter, returning zero results.
+// *categories is intentionally excluded when filtering by category_id because
+// expanding the categories relation conflicts with the category_id WHERE clause
+// in Medusa v2 and returns zero results. Use CATEGORY_LIST_FIELDS for those queries.
 const LIST_FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images,*categories';
+const CATEGORY_LIST_FIELDS = '*variants,+variants.calculated_price,+variants.inventory_quantity,*images';
 
 // Fields for the single product detail page only.
 // Includes variant options so the per-option selector UI can render.
@@ -131,7 +133,8 @@ export async function fetchProducts(
 
   const regionId = await getRegionId();
 
-  const params: Record<string, unknown> = { fields: LIST_FIELDS, limit, offset };
+  const fields = filters.categoryId ? CATEGORY_LIST_FIELDS : LIST_FIELDS;
+  const params: Record<string, unknown> = { fields, limit, offset };
   if (regionId)           params.region_id   = regionId;
   if (filters.search)     params.q           = filters.search;
   if (filters.categoryId) params.category_id = [filters.categoryId];

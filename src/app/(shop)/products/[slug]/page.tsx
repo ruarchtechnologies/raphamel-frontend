@@ -163,7 +163,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       return;
     }
     addToCart(
-      { variantId: resolvedVariant.id, quantity: qty },
+      {
+        variantId: resolvedVariant.id,
+        quantity: qty,
+        title: product!.name,
+        thumbnail: product!.images?.[0],
+        unitPrice: displayPrice,
+      },
       {
         onSuccess: () => {
           toast.success('Added to cart', { description: product!.name });

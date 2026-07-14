@@ -71,7 +71,7 @@ export function CategoryCard({ category, index = 0, priority = false }: Category
         <div className="relative h-44 overflow-hidden">
           {/* IMAGE NEEDED: see category.entity.ts for per-category specs */}
           <Image
-            src={category.image ?? '/images/categories/placeholder.jpg'}
+            src={category.image ?? '/images/category-hospital-consumables.png'}
             alt={category.name}
             fill
             priority={priority}
