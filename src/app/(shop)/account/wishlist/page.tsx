@@ -47,7 +47,7 @@ function WishlistItemRow({ item }: { item: WishlistItem }) {
 
   const variant  = item.product_variant;
   const product  = variant?.product;
-  const price    = variant?.calculated_price?.calculated_amount ?? variant?.prices?.[0]?.amount ?? 0;
+  const price    = variant?.prices?.[0]?.amount ?? 0;
   const name     = product?.title ?? 'Unknown product';
   const handle   = product?.handle;
   const thumbnail = product?.thumbnail;
