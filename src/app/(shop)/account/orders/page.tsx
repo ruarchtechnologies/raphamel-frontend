@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ShoppingBag, ArrowRight, Package } from 'lucide-react';
+import { ShoppingBag, ChevronRight, Package } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { sdk } from '@/lib/medusa';
@@ -65,9 +65,9 @@ function OrderSkeleton() {
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className="bg-white rounded-[6px] border border-gray-200 p-5 animate-pulse flex items-center gap-4"
+          className="bg-white rounded-[12px] border border-gray-200 p-5 animate-pulse flex items-center gap-4"
         >
-          <div className="w-12 h-12 rounded-[6px] bg-gray-100 shrink-0" />
+          <div className="w-12 h-12 rounded-[12px] bg-gray-100 shrink-0" />
           <div className="flex-1 space-y-2">
             <div className="h-4 bg-gray-100 rounded w-1/3" />
             <div className="h-3 bg-gray-100 rounded w-1/4" />
@@ -94,7 +94,7 @@ export default function OrdersPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm px-6 py-4">
+        <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm px-6 py-4">
           <h1 className="text-base font-semibold text-gray-900">My Orders</h1>
         </div>
         <OrderSkeleton />
@@ -104,7 +104,7 @@ export default function OrdersPage() {
 
   if (isError) {
     return (
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-10 text-center">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-10 text-center">
         <p className="text-gray-500 mb-4">Could not load your orders. Please try again.</p>
         <Button variant="outline" onClick={() => router.refresh()}>Retry</Button>
       </div>
@@ -119,7 +119,7 @@ export default function OrdersPage() {
       className="space-y-4"
     >
       {/* Header card */}
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm px-6 py-4">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm px-6 py-4">
         <h1 className="text-base font-semibold text-gray-900">My Orders</h1>
         {orders && orders.length > 0 && (
           <p className="text-sm text-gray-500 mt-0.5">{orders.length} order{orders.length !== 1 ? 's' : ''} placed</p>
@@ -128,7 +128,7 @@ export default function OrdersPage() {
 
       {/* Empty state */}
       {(!orders || orders.length === 0) && (
-        <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-12 text-center">
+        <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-12 text-center">
           <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4">
             <ShoppingBag size={28} className="text-gray-300" />
           </div>
@@ -154,12 +154,16 @@ export default function OrdersPage() {
               : `#${order.id.slice(-8).toUpperCase()}`;
 
             return (
-              <div
+              <Link
                 key={order.id}
-                className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+                href={`/account/orders/${order.id}`}
+                className="relative bg-white rounded-[12px] border border-gray-200 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:border-gray-300 hover:shadow-md transition-all duration-150"
               >
+                {/* Mobile chevron — top-right corner */}
+                <ChevronRight size={15} className="absolute top-4 right-4 text-gray-400 sm:hidden" />
+
                 {/* Item thumbnail */}
-                <div className="w-12 h-12 rounded-[6px] bg-gray-50 border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-[12px] bg-gray-50 border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
                   {firstItem?.thumbnail ? (
                     <img
                       src={firstItem.thumbnail}
@@ -189,19 +193,14 @@ export default function OrdersPage() {
                   </p>
                 </div>
 
-                {/* Total + link */}
-                <div className="flex items-center gap-4 shrink-0">
+                {/* Total + desktop chevron */}
+                <div className="flex items-center gap-3 shrink-0">
                   <span className="text-sm font-bold text-gray-900">
                     {formatPrice(order.total)}
                   </span>
-                  <Link
-                    href={`/account/orders/${order.id}`}
-                    className="flex items-center gap-1 text-sm text-primary hover:underline font-medium"
-                  >
-                    View <ArrowRight size={13} />
-                  </Link>
+                  <ChevronRight size={15} className="hidden sm:block text-gray-400" />
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

@@ -14,7 +14,7 @@ function Section({ title, description, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-6">
+    <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-6">
       <h3 className="text-base font-semibold text-gray-900">{title}</h3>
       <p className="text-sm text-gray-500 mt-0.5 mb-5">{description}</p>
       {children}
@@ -56,7 +56,7 @@ export default function SettingsPage() {
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-[6px]"
+            className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-[12px]"
           >
             <CheckCircle2 size={18} className="text-green-500 shrink-0" />
             <div>
@@ -174,7 +174,7 @@ export default function SettingsPage() {
         title="Danger Zone"
         description="Permanently deactivate your account. This action cannot be undone."
       >
-        <div className="flex items-start gap-3 p-4 bg-rose-50 border border-rose-200 rounded-[6px]">
+        <div className="flex items-start gap-3 p-4 bg-rose-50 border border-rose-200 rounded-[12px]">
           <AlertTriangle size={16} className="text-rose-500 shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-medium text-rose-800">Deactivate account</p>

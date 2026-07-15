@@ -43,7 +43,7 @@ export function AccountNav() {
     <nav className="flex flex-col gap-1">
       {/* User identity card — only after hydration to avoid SSR mismatch */}
       {mounted && me && (
-        <div className="flex items-center gap-3 p-4 mb-2 bg-gray-50 rounded-[6px] border border-gray-100">
+        <div className="flex items-center gap-3 p-4 mb-2 bg-gray-50 rounded-[10px] border border-gray-100">
           <div
             className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 bg-primary/10"
             style={{ color: 'var(--color-primary)' }}
@@ -70,7 +70,7 @@ export function AccountNav() {
             key={href}
             href={href}
             className={cn(
-              'flex items-center gap-3 px-4 py-2.5 rounded-[6px] text-sm font-medium transition-colors group',
+              'flex items-center gap-3 px-4 py-2.5 rounded-[8px] text-sm font-medium transition-colors group',
               isActive
                 ? 'bg-primary/8 text-primary'
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
@@ -93,7 +93,7 @@ export function AccountNav() {
       <button
         onClick={handleLogout}
         disabled={isPending}
-        className="flex items-center gap-3 px-4 py-2.5 rounded-[6px] text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-50 mt-2 border-t border-gray-100 pt-4"
+        className="flex items-center gap-3 px-4 py-2.5 rounded-[8px] text-sm font-medium text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-50 mt-2 border-t border-gray-100 pt-4"
       >
         <LogOut size={16} className="shrink-0" />
         {isPending ? 'Signing out…' : 'Sign out'}

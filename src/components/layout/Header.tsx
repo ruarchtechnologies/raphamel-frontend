@@ -25,10 +25,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import {
-  Menu, Heart, ShoppingBag, User, ChevronDown, Search,
-} from 'lucide-react';
-// Note: User is still used in the mobile Account icon link below
+import { Menu, Heart, ShoppingBag, User, ChevronDown, Search } from 'lucide-react';
 import { SearchBar } from './SearchBar';
 import { CartSidebar } from './CartSidebar';
 import { MobileMenu } from './MobileMenu';
@@ -36,6 +33,7 @@ import { UserMenu } from './UserMenu';
 import { useUIStore } from '@/stores/ui.store';
 import { useCartItemCount } from '@/features/cart/hooks/useCart';
 import { useMe } from '@/features/auth/hooks/useAuth';
+import { useWishlist } from '@/features/wishlist/hooks/useWishlist';
 import { cn } from '@/lib/utils';
 
 // ── Navigation configuration ─────────────────────────────────────────────────
@@ -51,14 +49,11 @@ const NAV_LINKS = [
     href: '/categories',
     children: [
       { label: 'Hospital Consumables', href: '/categories/hospital-consumables' },
-      { label: 'Surgical Equipment', href: '/categories/surgical-equipment' },
-      { label: 'Diagnostic Devices', href: '/categories/diagnostic-devices' },
-      { label: 'Personal Protective Equip.', href: '/categories/personal-protective-equipment' },
-      { label: 'Rehabilitation Equipment', href: '/categories/rehabilitation-equipment' },
-      { label: 'Laboratory Supplies', href: '/categories/laboratory-supplies' },
-      { label: 'Patient Care Products', href: '/categories/patient-care-products' },
-      { label: 'Mobility & Orthopaedic', href: '/categories/mobility-orthopaedic-aids' },
-      { label: 'Imaging & Monitoring', href: '/categories/imaging-monitoring-equipment' },
+      { label: 'Surgical Equipment',   href: '/categories/surgical-equipment' },
+      { label: 'Diagnostic Devices',   href: '/categories/diagnostic-devices' },
+      { label: 'PPE',                  href: '/categories/personal-protective-equipment' },
+      { label: 'Lab Supplies',         href: '/categories/laboratory-supplies' },
+      { label: 'Rehabilitation',        href: '/categories/rehabilitation-equipment' },
     ],
   },
   // { label: 'Suppliers', href: '/vendors' }, // DISABLED: vendor/supplier feature removed
@@ -129,6 +124,8 @@ export function Header() {
   const { setCartOpen, setMenuOpen } = useUIStore();
   const itemCount = useCartItemCount();
   const { data: me, isLoading: authLoading } = useMe();
+  const { data: wishlist } = useWishlist();
+  const wishlistCount = mounted ? (wishlist?.items_count ?? 0) : 0;
   const pathname = usePathname();
 
   useEffect(() => {
@@ -152,7 +149,6 @@ export function Header() {
           style={{ height: 'var(--header-height, 74px)' }}
         >
           <div className="container h-full flex items-center gap-4">
-            {/* Mobile menu toggle — FLUTTER EQUIV: IconButton opening Drawer */}
             <button
               className="lg:hidden flex items-center justify-center w-10 h-10 rounded-[6px] hover:bg-gray-100 transition-colors text-gray-700"
               onClick={() => setMenuOpen(true)}
@@ -195,10 +191,15 @@ export function Header() {
               {/* Wishlist */}
               <Link
                 href="/account/wishlist"
-                className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors text-gray-700"
+                className="hidden sm:flex relative items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors text-gray-700"
                 aria-label="Wishlist"
               >
                 <Heart size={20} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 leading-none">
+                    {wishlistCount > 99 ? '99+' : wishlistCount}
+                  </span>
+                )}
               </Link>
 
               {/* Account */}

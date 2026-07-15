@@ -73,7 +73,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100">
         <h2 className="text-base font-semibold text-gray-900">{title}</h2>
         {description && <p className="text-sm text-gray-500 mt-0.5">{description}</p>}
@@ -148,7 +148,7 @@ export default function AccountProfilePage() {
     return (
       <div className="space-y-4">
         {[1, 2].map((i) => (
-          <div key={i} className="bg-white rounded-[6px] border border-gray-200 h-48 animate-pulse" />
+          <div key={i} className="bg-white rounded-[12px] border border-gray-200 h-48 animate-pulse" />
         ))}
       </div>
     );
@@ -165,7 +165,7 @@ export default function AccountProfilePage() {
         transition={{ duration: 0.3 }}
         className="max-w-lg mx-auto"
       >
-        <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-8 text-center">
+        <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-8 text-center">
           {me.verificationStatus === 'rejected' ? (
             <>
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-50 mb-5">
@@ -176,14 +176,14 @@ export default function AccountProfilePage() {
                 Your account application was not approved after review.
               </p>
               {me.rejectionNotes && (
-                <div className="bg-rose-50 border border-rose-200 rounded-[6px] p-4 mb-6 text-left">
+                <div className="bg-rose-50 border border-rose-200 rounded-[12px] p-4 mb-6 text-left">
                   <p className="text-sm font-medium text-rose-800 mb-1">Reason</p>
                   <p className="text-sm text-rose-700">{me.rejectionNotes}</p>
                 </div>
               )}
               <a
                 href="mailto:support@raphamel.com"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-[6px] text-sm font-medium text-white"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-[12px] text-sm font-medium text-white"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 Contact Support
@@ -199,7 +199,7 @@ export default function AccountProfilePage() {
                 Your documents are being reviewed by our compliance team.
                 You&apos;ll receive an email once approved — usually within 1–2 business days.
               </p>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-[6px] p-4 text-left mb-6">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-[12px] p-4 text-left mb-6">
                 <p className="text-sm font-medium text-yellow-800 mb-2">Submitted details</p>
                 <ul className="text-sm text-yellow-700 space-y-1">
                   <li><span className="font-medium">Name:</span> {me.firstName} {me.lastName}</li>
@@ -237,7 +237,7 @@ export default function AccountProfilePage() {
       className="space-y-6"
     >
       {/* ── Profile header ─────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-6 flex items-center gap-5">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-6 flex items-center gap-5">
         {/* Avatar */}
         <div
           className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold shrink-0 bg-primary/10"
@@ -260,7 +260,7 @@ export default function AccountProfilePage() {
 
       {/* ── Rejection notice (only when rejected) ──────────────────────────── */}
       {me.rejectionNotes && (
-        <div className="bg-rose-50 border border-rose-200 rounded-[6px] p-4 flex gap-3">
+        <div className="bg-rose-50 border border-rose-200 rounded-[12px] p-4 flex gap-3">
           <XCircle size={18} className="text-rose-500 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-rose-800">Application not approved</p>

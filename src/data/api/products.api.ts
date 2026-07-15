@@ -34,11 +34,13 @@ function toProductEntity(p: HttpTypes.StoreProduct): ProductEntity {
 
   const category = p.categories?.[0];
 
-  const options = p.options?.map((o) => ({
-    id: o.id,
-    title: o.title ?? '',
-    values: (o.values ?? []).map((val) => val.value).filter(Boolean) as string[],
-  }));
+  const options = p.options
+    ?.map((o) => ({
+      id: o.id,
+      title: o.title ?? '',
+      values: (o.values ?? []).map((val) => val.value).filter(Boolean) as string[],
+    }))
+    .filter((o) => o.title !== 'Default option' && !o.values.every((v) => v === 'Default option value'));
 
   const variants = p.variants
     ?.map((v) => {

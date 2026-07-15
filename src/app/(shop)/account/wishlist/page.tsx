@@ -20,9 +20,9 @@ function WishlistSkeleton() {
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className="bg-white rounded-[6px] border border-gray-200 p-4 animate-pulse flex items-center gap-4"
+          className="bg-white rounded-[12px] border border-gray-200 p-4 animate-pulse flex items-center gap-4"
         >
-          <div className="w-16 h-16 rounded-[6px] bg-gray-100 shrink-0" />
+          <div className="w-16 h-16 rounded-[12px] bg-gray-100 shrink-0" />
           <div className="flex-1 space-y-2">
             <div className="h-4 bg-gray-100 rounded w-2/3" />
             <div className="h-3 bg-gray-100 rounded w-1/4" />
@@ -30,7 +30,7 @@ function WishlistSkeleton() {
           </div>
           <div className="flex gap-2 shrink-0">
             <div className="h-9 w-9 bg-gray-100 rounded-full" />
-            <div className="h-9 w-24 bg-gray-100 rounded-[6px]" />
+            <div className="h-9 w-24 bg-gray-100 rounded-[12px]" />
           </div>
         </div>
       ))}
@@ -88,10 +88,10 @@ function WishlistItemRow({ item }: { item: WishlistItem }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
       transition={{ duration: 0.25 }}
-      className="bg-white rounded-[6px] border border-gray-200 p-4 flex items-center gap-4"
+      className="bg-white rounded-[12px] border border-gray-200 p-4 flex items-center gap-4"
     >
       {/* Thumbnail */}
-      <div className="w-16 h-16 rounded-[6px] bg-gray-50 border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
+      <div className="w-16 h-16 rounded-[12px] bg-gray-50 border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
         {thumbnail ? (
           <Image
             src={thumbnail}
@@ -159,7 +159,7 @@ export default function WishlistPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm px-6 py-4">
+        <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm px-6 py-4">
           <h1 className="text-base font-semibold text-gray-900">Wishlist</h1>
         </div>
         <WishlistSkeleton />
@@ -169,7 +169,7 @@ export default function WishlistPage() {
 
   if (isError) {
     return (
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-10 text-center">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-10 text-center">
         <p className="text-gray-500 mb-4">Could not load your wishlist. Please try again.</p>
         <Button variant="outline" onClick={() => refetch()}>Retry</Button>
       </div>
@@ -186,7 +186,7 @@ export default function WishlistPage() {
       className="space-y-4"
     >
       {/* Header */}
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm px-6 py-4">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm px-6 py-4">
         <h1 className="text-base font-semibold text-gray-900">Wishlist</h1>
         {items.length > 0 && (
           <p className="text-sm text-gray-500 mt-0.5">
@@ -197,7 +197,7 @@ export default function WishlistPage() {
 
       {/* Empty state */}
       {items.length === 0 && (
-        <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-12 text-center">
+        <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-12 text-center">
           <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center mx-auto mb-4">
             <Heart size={28} className="text-rose-300" />
           </div>

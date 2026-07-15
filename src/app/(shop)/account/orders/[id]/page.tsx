@@ -89,10 +89,10 @@ function Skeleton() {
   return (
     <div className="space-y-4 animate-pulse">
       <div className="h-8 bg-gray-100 rounded w-1/3" />
-      <div className="bg-white rounded-[6px] border border-gray-200 p-5 space-y-3">
+      <div className="bg-white rounded-[12px] border border-gray-200 p-5 space-y-3">
         {[1, 2].map((i) => (
           <div key={i} className="flex gap-4">
-            <div className="w-16 h-16 bg-gray-100 rounded-[6px]" />
+            <div className="w-16 h-16 bg-gray-100 rounded-[12px]" />
             <div className="flex-1 space-y-2">
               <div className="h-4 bg-gray-100 rounded w-2/3" />
               <div className="h-3 bg-gray-100 rounded w-1/3" />
@@ -120,7 +120,7 @@ export default function OrderDetailPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm px-6 py-4">
+        <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm px-6 py-4">
           <div className="h-5 bg-gray-100 rounded w-1/4 animate-pulse" />
         </div>
         <Skeleton />
@@ -130,7 +130,7 @@ export default function OrderDetailPage() {
 
   if (isError || !order) {
     return (
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-10 text-center">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-10 text-center">
         <p className="text-gray-500 mb-4">Could not load this order.</p>
         <Button variant="outline" onClick={() => router.push('/account/orders')}>
           Back to Orders
@@ -151,7 +151,7 @@ export default function OrderDetailPage() {
       className="space-y-4"
     >
       {/* Header */}
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm px-6 py-4 flex items-center gap-4">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm px-6 py-4 flex items-center gap-4">
         <button
           onClick={() => router.push('/account/orders')}
           className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -169,7 +169,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Items */}
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-5">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-5">
         <div className="flex items-center gap-2 mb-4">
           <Package size={15} className="text-gray-400" />
           <h2 className="text-sm font-semibold text-gray-900">Items</h2>
@@ -177,7 +177,7 @@ export default function OrderDetailPage() {
         <div className="divide-y divide-gray-100">
           {order.items?.map((item) => (
             <div key={item.id} className="flex gap-3 py-3 first:pt-0 last:pb-0">
-              <div className="w-14 h-14 rounded-[6px] border border-gray-100 bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-[12px] border border-gray-100 bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
                 {item.thumbnail ? (
                   <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" />
                 ) : (
@@ -219,7 +219,7 @@ export default function OrderDetailPage() {
 
       {/* Shipping address */}
       {addr && (
-        <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-5">
+        <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-5">
           <div className="flex items-center gap-2 mb-3">
             <MapPin size={15} className="text-gray-400" />
             <h2 className="text-sm font-semibold text-gray-900">Shipping Address</h2>
@@ -238,7 +238,7 @@ export default function OrderDetailPage() {
       )}
 
       {/* Payment */}
-      <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-5">
+      <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-5">
         <div className="flex items-center gap-2 mb-3">
           <CreditCard size={15} className="text-gray-400" />
           <h2 className="text-sm font-semibold text-gray-900">Payment</h2>
@@ -266,8 +266,8 @@ export default function OrderDetailPage() {
         </Button>
         <p className="text-xs text-gray-400">
           Need help?{' '}
-          <a href="mailto:support@raphamel.health" className="text-primary hover:underline">
-            support@raphamel.health
+          <a href="mailto:support@raphamel.com" className="text-primary hover:underline">
+            support@raphamel.com
           </a>
         </p>
       </div>

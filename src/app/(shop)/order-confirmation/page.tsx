@@ -109,8 +109,8 @@ function OrderConfirmationContent() {
           className="mt-8 text-xs text-gray-400"
         >
           Questions? Email us at{' '}
-          <a href="mailto:support@raphamel.health" className="text-primary hover:underline">
-            support@raphamel.health
+          <a href="mailto:support@raphamel.com" className="text-primary hover:underline">
+            support@raphamel.com
           </a>
         </motion.p>
       </div>

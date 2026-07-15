@@ -76,7 +76,6 @@ export interface WishlistVariant {
   id: string;
   title: string;
   prices?: { amount: number; currency_code: string }[];
-  calculated_price?: { calculated_amount: number } | null;
   product: WishlistProduct;
 }
 
@@ -96,11 +95,14 @@ export interface WishlistData {
   name: string | null;
 }
 
-// Extra fields to request so we can link back to products on the wishlist page
+// Extra fields to request so we can link back to products on the wishlist page.
+// NOTE: do not include calculated_price.* here — it requires a QueryContext
+// (region_id + currency_code) and the plugin doesn't supply one, causing a
+// 500 that clears the stored wishlist ID and wipes items on every refresh.
 const EXTRA_ITEM_FIELDS = [
   'product_variant.product.title',
-  'product_variant.product.handle',
-  'product_variant.calculated_price.*',
+  'product_variant.prices.amount',
+  'product_variant.prices.currency_code',
 ].map((f) => `items_fields[]=${encodeURIComponent(f)}`).join('&');
 
 // ── Core wishlist operations ──────────────────────────────────────────────────

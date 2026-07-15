@@ -93,7 +93,7 @@ export function ProductCard({ product, layout = 'grid', index = 0 }: ProductCard
               alt={product.name}
               fill
               sizes="72px"
-              className="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
         </Link>

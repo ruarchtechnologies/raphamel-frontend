@@ -22,10 +22,7 @@
  */
 
 import { HeroBanner } from '@/components/home/HeroBanner';
-import { CategorySection } from '@/components/home/CategorySection';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
-// import { VendorSection } from '@/components/home/VendorSection'; // DISABLED: vendor/supplier feature removed
-import { PromoStrip } from '@/components/home/PromoStrip';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -56,10 +53,7 @@ export default function HomePage() {
   return (
     <div className="page-enter">
       <HeroBanner />
-      <CategorySection />
-      <PromoStrip />
       <FeaturedProducts />
-      {/* <VendorSection /> DISABLED: vendor/supplier feature removed */}
     </div>
   );
 }

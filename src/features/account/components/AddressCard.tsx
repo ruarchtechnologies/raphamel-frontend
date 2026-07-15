@@ -13,28 +13,19 @@ interface AddressCardProps {
 
 export function AddressCard({ address, onEdit, onDelete, isDeleting }: AddressCardProps) {
   const isDefaultShipping = address.is_default_shipping;
-  const isDefaultBilling  = address.is_default_billing;
 
   return (
     <div
       className={cn(
-        'bg-white rounded-[6px] border p-5 shadow-sm flex flex-col gap-3 transition-colors',
+        'bg-white rounded-[12px] border p-5 shadow-sm flex flex-col gap-3 transition-colors',
         isDefaultShipping ? 'border-primary/40' : 'border-gray-200',
       )}
     >
-      {/* Badges */}
-      {(isDefaultShipping || isDefaultBilling) && (
-        <div className="flex flex-wrap gap-1.5">
-          {isDefaultShipping && (
-            <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-              Default Shipping
-            </span>
-          )}
-          {isDefaultBilling && (
-            <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
-              Default Billing
-            </span>
-          )}
+      {isDefaultShipping && (
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+            Default Shipping
+          </span>
         </div>
       )}
 

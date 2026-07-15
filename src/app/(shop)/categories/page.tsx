@@ -72,7 +72,7 @@ export default async function CategoriesPage() {
               Our procurement team will source it from our verified supplier network.
             </p>
             <a
-              href="mailto:procurement@raphamel.health"
+              href="mailto:procurement@raphamel.com"
               className="inline-flex items-center h-12 px-8 bg-[#FACC15] text-gray-900 text-sm font-bold rounded-[6px] hover:bg-[#e6b800] transition-colors"
             >
               Contact Procurement Team

@@ -67,7 +67,7 @@ export function CategoryCard({ category, index = 0, priority = false }: Category
         style={{ backgroundColor: category.color ?? '#f9fafb' }}
       >
         {/* Image — FLUTTER EQUIV: CachedNetworkImage inside ClipRRect */}
-        <div className="relative h-44 overflow-hidden">
+        <div className="relative h-44 overflow-hidden rounded-t-[12px]">
           {/* IMAGE NEEDED: see category.entity.ts for per-category specs */}
           <Image
             src={category.image ?? '/images/category-hospital-consumables.png'}

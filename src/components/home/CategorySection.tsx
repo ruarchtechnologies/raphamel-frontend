@@ -87,7 +87,7 @@ export function CategorySection() {
                */}
               <Link
                 href={`/categories/${cat.slug}`}
-                className="flex flex-col items-center gap-2.5 p-3 rounded-[10px] hover:shadow-lg transition-all group"
+                className="flex flex-col items-center gap-2.5 p-3 rounded-[14px] hover:shadow-lg transition-all group"
                 style={{ backgroundColor: cat.color }}
               >
                 {/* Category icon — fixed 56×56, clipped to circle by the parent */}

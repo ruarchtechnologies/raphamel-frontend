@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { Button } from '@/components/ui/Button';
 import { Drawer } from '@/components/layout/Drawer';
@@ -190,28 +190,6 @@ export default function ProductsPage() {
       </div>
 
       <div className="container py-8">
-        {/* Sort bar */}
-        <div className="flex items-center justify-between mb-5">
-          <button
-            className="lg:hidden flex items-center gap-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-[6px] px-3 py-2"
-            onClick={() => setFilterOpen(true)}
-          >
-            <SlidersHorizontal size={15} /> Filters
-          </button>
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="text-sm text-gray-500 hidden sm:block">Sort by:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as ProductFilters['sortBy'])}
-              className="input-base h-9 text-sm py-0 w-auto pr-8"
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
         <div className="flex gap-7">
           {/* Sidebar filter — desktop */}
           <aside className="hidden lg:block w-56 flex-shrink-0">
@@ -247,6 +225,7 @@ export default function ProductsPage() {
                 showToolbar
                 loading={isLoading}
                 onFilterOpen={() => setFilterOpen(true)}
+                onSortChange={(s) => setSortBy(s as ProductFilters['sortBy'])}
               />
             )}
           </div>

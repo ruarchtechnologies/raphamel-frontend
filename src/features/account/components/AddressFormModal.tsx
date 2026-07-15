@@ -30,7 +30,6 @@ const schema = z.object({
   province:             z.string().min(1, 'State is required'),
   phone:                z.string().optional(),
   is_default_shipping:  z.boolean().optional(),
-  is_default_billing:   z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -72,13 +71,12 @@ export function AddressFormModal({ open, onClose, address, onSave, isSaving }: A
         province:            address.province ?? '',
         phone:               address.phone ?? '',
         is_default_shipping: address.is_default_shipping ?? false,
-        is_default_billing:  address.is_default_billing ?? false,
       });
     } else {
       reset({
         first_name: '', last_name: '', address_1: '', address_2: '',
         city: '', province: '', phone: '',
-        is_default_shipping: false, is_default_billing: false,
+        is_default_shipping: false,
       });
     }
   }, [address, reset]);
@@ -155,17 +153,10 @@ export function AddressFormModal({ open, onClose, address, onSave, isSaving }: A
           {...register('phone')}
         />
 
-        {/* Default address toggles */}
-        <div className="space-y-2 pt-1">
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input type="checkbox" className="accent-primary" {...register('is_default_shipping')} />
-            <span className="text-sm text-gray-700">Set as default shipping address</span>
-          </label>
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input type="checkbox" className="accent-primary" {...register('is_default_billing')} />
-            <span className="text-sm text-gray-700">Set as default billing address</span>
-          </label>
-        </div>
+        <label className="flex items-center gap-2.5 cursor-pointer pt-1">
+          <input type="checkbox" className="accent-primary" {...register('is_default_shipping')} />
+          <span className="text-sm text-gray-700">Set as default shipping address</span>
+        </label>
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">

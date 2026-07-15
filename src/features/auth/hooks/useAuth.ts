@@ -30,6 +30,7 @@ import { login, register, logout, fetchMe, updateProfile, forgotPassword, resetP
 import type { LoginPayload, RegisterPayload, UpdateProfilePayload } from '@/data/api/auth.api';
 import { setAuthCookie, setStatusCookie, clearAuthCookie } from '@/lib/auth-cookie';
 import { clearWishlistId } from '@/data/api/wishlist.api';
+import { clearCartId } from '@/data/api/cart.api';
 import { wishlistKeys } from '@/features/wishlist/hooks/useWishlist';
 import { toast } from 'sonner';
 
@@ -106,9 +107,10 @@ export function useLogout() {
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
+      clearCartId();
       clearWishlistId();
-      queryClient.clear();
       clearAuthCookie();
+      queryClient.clear();
       toast.success('Signed out successfully.');
     },
   });

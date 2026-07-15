@@ -57,7 +57,7 @@ export function FeaturedProducts() {
         </div>
 
         {/* Category chips */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {catsLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex-shrink-0 h-9 w-24 rounded-full bg-gray-200 animate-pulse" />

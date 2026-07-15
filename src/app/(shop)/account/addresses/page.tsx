@@ -53,7 +53,7 @@ export default function AddressesPage() {
   const isSaving = createAddress.isPending || updateAddress.isPending;
 
   return (
-    <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-6">
+    <div className="bg-white rounded-[12px] border border-gray-200 shadow-sm p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -71,7 +71,7 @@ export default function AddressesPage() {
       {isLoading ? (
         <div className="grid sm:grid-cols-2 gap-4">
           {[1, 2].map((i) => (
-            <div key={i} className="h-44 bg-gray-50 rounded-[6px] animate-pulse border border-gray-100" />
+            <div key={i} className="h-44 bg-gray-50 rounded-[12px] animate-pulse border border-gray-100" />
           ))}
         </div>
       ) : isError ? (

@@ -154,7 +154,7 @@ export default function CategoryDetailPage({ params }: Props) {
               Contact us to source directly or be notified when products go live.
             </p>
             <a
-              href="mailto:procurement@raphamel.health"
+              href="mailto:procurement@raphamel.com"
               className="inline-flex items-center h-11 px-6 bg-primary text-white text-sm font-bold rounded-[6px] hover:bg-[#005bb5] transition-colors"
             >
               Contact Procurement
