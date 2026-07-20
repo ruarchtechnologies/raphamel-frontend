@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import {
   Eye, EyeOff, Mail, Lock, User, Phone,
-  ArrowRight, ArrowLeft, Upload, X,
+  ArrowRight, ArrowLeft, Upload, X, Building2,
   Hospital, Pill, Store, CheckCircle2, ShieldCheck,
 } from 'lucide-react';
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -15,9 +15,11 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { AddressAutocompleteInput, type ParsedAddress } from '@/components/ui/AddressAutocompleteInput';
 import { AuthLeftPanel } from '@/components/auth/AuthLeftPanel';
 import { cn } from '@/lib/utils';
 import { useRegister } from '@/features/auth/hooks/useAuth';
+import { createFacility } from '@/data/api/facility.api';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -361,6 +363,8 @@ export default function RegisterPage() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [facility, setFacility] = useState<FacilityType | null>(null);
+  const [facilityName, setFacilityName] = useState('');
+  const [facilityAddress, setFacilityAddress] = useState<ParsedAddress | null>(null);
   const [cacDoc, setCacDoc] = useState<File | null>(null);
   const [licenceDoc, setLicenceDoc] = useState<File | null>(null);
   const [step1Data, setStep1Data] = useState<Step1Data | null>(null);
@@ -417,7 +421,9 @@ export default function RegisterPage() {
 
   // Step 2 submit — upload docs then create account
   const onStep2 = async () => {
+    if (!facilityName.trim()) { toast.error('Please enter your facility name.'); return; }
     if (!facility) { toast.error('Please select your facility type.'); return; }
+    if (!facilityAddress) { toast.error('Please select your facility address from the suggestions.'); return; }
     if (!cacDoc && !licenceDoc) { toast.error('Please upload at least one verification document.'); return; }
     if (!step1Data) return;
 
@@ -465,7 +471,20 @@ export default function RegisterPage() {
         licenceDocUrl,
       },
       {
-        onSuccess: () => navigate('3'),
+        onSuccess: async () => {
+          try {
+            await createFacility({
+              facilityName: facilityName.trim(),
+              address: facilityAddress.formattedAddress,
+              latitude: facilityAddress.lat,
+              longitude: facilityAddress.lng,
+              placeId: facilityAddress.placeId,
+            });
+          } catch {
+            toast.error('Account created, but we couldn\'t save your facility details. You can update this later.');
+          }
+          navigate('3');
+        },
         onError: () => setIsSubmitting(false),
       },
     );
@@ -654,6 +673,14 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-6">
+                    <Input
+                      label="Facility name"
+                      placeholder="Grace Specialist Hospital"
+                      leftIcon={<Building2 size={14} />}
+                      value={facilityName}
+                      onChange={(e) => setFacilityName(e.target.value)}
+                    />
+
                     <div>
                       <p className="text-sm font-medium text-gray-700 mb-2.5">Facility type</p>
                       <div className="grid grid-cols-1 gap-2.5">
@@ -684,6 +711,11 @@ export default function RegisterPage() {
                         ))}
                       </div>
                     </div>
+
+                    <AddressAutocompleteInput
+                      label="Facility address"
+                      onSelect={setFacilityAddress}
+                    />
 
                     <AnimatePresence>
                       {facility === 'hospital' && (
@@ -766,7 +798,7 @@ export default function RegisterPage() {
                         className="flex-1"
                         rightIcon={<ArrowRight size={16} />}
                         loading={isSubmitting}
-                        disabled={!facility || (!cacDoc && !licenceDoc) || isSubmitting}
+                        disabled={!facilityName.trim() || !facility || !facilityAddress || (!cacDoc && !licenceDoc) || isSubmitting}
                         onClick={onStep2}
                       >
                         Submit
