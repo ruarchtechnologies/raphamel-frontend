@@ -17,6 +17,8 @@ import { useCart, useClearCart } from '@/features/cart/hooks/useCart';
 import { useMe } from '@/features/auth/hooks/useAuth';
 import { useAddresses } from '@/features/account/hooks/useAddresses';
 import type { Address } from '@/features/account/hooks/useAddresses';
+import { useFacility } from '@/features/account/hooks/useFacility';
+import { CompleteFacilityGate } from '@/features/checkout/components/CompleteFacilityGate';
 import {
   updateCartAddress,
   listShippingOptions,
@@ -122,6 +124,7 @@ function OrderSummary({
 export default function CheckoutPage() {
   const router  = useRouter();
   const { data: me, isLoading: meLoading } = useMe();
+  const { data: facility, isLoading: facilityLoading } = useFacility();
   const { data: cart, isLoading: cartLoading } = useCart();
   const clearCart = useClearCart();
   const { pay, isPaying } = usePaystackSession();
@@ -314,6 +317,12 @@ export default function CheckoutPage() {
         </div>
       </div>
     );
+  }
+
+  // ── Facility guard ────────────────────────────────────────────────────────────
+
+  if (!meLoading && me && !facilityLoading && facility === null) {
+    return <CompleteFacilityGate />;
   }
 
   // ── Empty cart guard ──────────────────────────────────────────────────────────

@@ -1,36 +1,29 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { AddressAutocompleteInput, type ParsedAddress } from '@/components/ui/AddressAutocompleteInput';
+import { useMe } from '@/features/auth/hooks/useAuth';
 import type { Address, AddressInput } from '@/features/account/hooks/useAddresses';
-
-// ── Nigerian states ───────────────────────────────────────────────────────────
-
-const NG_STATES = [
-  'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue',
-  'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT',
-  'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi',
-  'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo',
-  'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara',
-];
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 
 const schema = z.object({
-  first_name:           z.string().min(1, 'First name is required'),
-  last_name:            z.string().min(1, 'Last name is required'),
-  address_1:            z.string().min(1, 'Street address is required'),
-  address_2:            z.string().optional(),
-  city:                 z.string().min(1, 'City is required'),
-  province:             z.string().min(1, 'State is required'),
   phone:                z.string().optional(),
   is_default_shipping:  z.boolean().optional(),
 });
+
+interface SelectedAddress {
+  address_1: string;
+  city: string;
+  province: string;
+}
 
 type FormValues = z.infer<typeof schema>;
 
@@ -49,13 +42,10 @@ interface AddressFormModalProps {
 
 export function AddressFormModal({ open, onClose, address, onSave, isSaving }: AddressFormModalProps) {
   const isEdit = address !== null;
+  const { data: me, isLoading: meLoading } = useMe();
+  const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormValues>({
+  const { register, handleSubmit, reset } = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
 
@@ -63,27 +53,52 @@ export function AddressFormModal({ open, onClose, address, onSave, isSaving }: A
   useEffect(() => {
     if (address) {
       reset({
-        first_name:          address.first_name ?? '',
-        last_name:           address.last_name ?? '',
-        address_1:           address.address_1 ?? '',
-        address_2:           address.address_2 ?? '',
-        city:                address.city ?? '',
-        province:            address.province ?? '',
         phone:               address.phone ?? '',
         is_default_shipping: address.is_default_shipping ?? false,
       });
-    } else {
-      reset({
-        first_name: '', last_name: '', address_1: '', address_2: '',
-        city: '', province: '', phone: '',
-        is_default_shipping: false,
+      setSelectedAddress({
+        address_1: address.address_1 ?? '',
+        city:      address.city ?? '',
+        province:  address.province ?? '',
       });
+    } else {
+      reset({ phone: '', is_default_shipping: false });
+      setSelectedAddress(null);
     }
   }, [address, reset]);
 
+  // We only deliver within Lagos for now — reject anything else right at selection.
+  function onAddressSelect(parsed: ParsedAddress) {
+    if (parsed.province.toLowerCase() !== 'lagos') {
+      toast.error('Sorry, we currently only deliver within Lagos State.');
+      setSelectedAddress(null);
+      return false;
+    }
+    setSelectedAddress({
+      address_1: parsed.addressLine || parsed.formattedAddress,
+      city: parsed.city,
+      province: parsed.province,
+    });
+  }
+
   const onSubmit = (data: FormValues) => {
-    onSave({ ...data, country_code: 'ng' });
+    if (!me) return;
+    if (!selectedAddress) {
+      toast.error('Please select your address from the suggestions.');
+      return;
+    }
+    onSave({
+      ...selectedAddress,
+      ...data,
+      first_name: me.firstName,
+      last_name: me.lastName,
+      country_code: 'ng',
+    });
   };
+
+  const searchDefaultValue = address
+    ? [address.address_1, address.city, address.province].filter(Boolean).join(', ')
+    : undefined;
 
   return (
     <Modal
@@ -93,58 +108,12 @@ export function AddressFormModal({ open, onClose, address, onSave, isSaving }: A
       size="lg"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="First name"
-            placeholder="Ade"
-            error={errors.first_name?.message}
-            {...register('first_name')}
-          />
-          <Input
-            label="Last name"
-            placeholder="Okafor"
-            error={errors.last_name?.message}
-            {...register('last_name')}
-          />
-        </div>
-
-        <Input
-          label="Street address"
-          placeholder="12 Industrial Ave"
-          error={errors.address_1?.message}
-          {...register('address_1')}
+        <AddressAutocompleteInput
+          label="Search address"
+          placeholder="Start typing your street address…"
+          defaultValue={searchDefaultValue}
+          onSelect={onAddressSelect}
         />
-
-        <Input
-          label="Apartment, suite, etc. (optional)"
-          placeholder="Suite 3B"
-          {...register('address_2')}
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="City"
-            placeholder="Lagos"
-            error={errors.city?.message}
-            {...register('city')}
-          />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">State</label>
-            <select
-              className="input-base appearance-none pr-8"
-              {...register('province')}
-            >
-              <option value="">Select state…</option>
-              {NG_STATES.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-            {errors.province && (
-              <p className="mt-1 text-xs text-rose-600">{errors.province.message}</p>
-            )}
-          </div>
-        </div>
 
         <Input
           label="Phone (optional)"
@@ -163,7 +132,13 @@ export function AddressFormModal({ open, onClose, address, onSave, isSaving }: A
           <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" className="flex-1" loading={isSaving}>
+          <Button
+            type="submit"
+            variant="primary"
+            className="flex-1"
+            loading={isSaving}
+            disabled={meLoading}
+          >
             {isEdit ? 'Save Changes' : 'Add Address'}
           </Button>
         </div>
